@@ -5,7 +5,7 @@
 	|_| \_\___|\__,_|_|___/_|  |___/
 
 
-Simple utility for pumping files in and out of Redis. Not even sure if it is a good idea.
+Simple utility for pumping files in and out of Redis.
 
 ## Getting Started
 
