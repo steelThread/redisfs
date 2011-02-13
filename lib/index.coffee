@@ -11,17 +11,17 @@ exports.version = "0.1.0"
 #               (Default: redisfs).
 #   database  - Optional Integer of the Redis database to select.
 #   dir       - Optional path to write files out to.
-#			
+#           
 exports.redisfs = (options) ->
   new exports.RedisFs options or {}
 
 # 
 # Dependencies
 #
-_              = require 'underscore'
-fs             = require 'fs'
-uuid           = require 'node-uuid'
-temp           = require 'temp'
+_    = require 'underscore'
+fs   = require 'fs'
+uuid = require 'node-uuid'
+temp = require 'temp'
 
 #
 # Util to pump files in and out of redis.  
@@ -31,7 +31,7 @@ class RedisFs
     @redis      = options.redis or connectToRedis options
     @namespace ?= 'redisfs'
     @redis.select options.database if options.database?
-	
+    
   #
   # pumps a file contents into a redis key.  takes a config hash:
   #  - filename -> the full path to the file to consume
@@ -43,11 +43,11 @@ class RedisFs
   #                as the second param.
   #
   file2redis: (config) ->
-	key      = config.key or uuid()
-	filename = config.filename
-	callback = config.callback
-	encoding = encoding or 'utf8'
-	@keys.push key unless config.key
+    key      = config.key or uuid()
+    filename = config.filename
+    callback = config.callback
+    encoding = encoding or 'utf8'
+    @keys.push key unless config.key
     fs.readFile filename, encoding, (err, data) =>
       if err? then callback err else @set key, data, callback
 
@@ -62,9 +62,9 @@ class RedisFs
   #                and a fd to the file
   #
   redis2file: (config) ->
-	key      = config.key
-	callback = config.callback
-	encoding = encoding or 'utf8'    
+    key      = config.key
+    callback = config.callback
+    encoding = encoding or 'utf8'    
     @get key, (err, value) =>
       if err callback err else write filename, value, encoding, callback
 
@@ -119,7 +119,7 @@ class RedisFs
 
 #
 # fetch a redis client
-#	  
+#     
 connectToRedis = (options) ->
   require('redis').createClient options.port, options.host
 
