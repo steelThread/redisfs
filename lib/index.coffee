@@ -1,4 +1,4 @@
-exports.version = "0.1.0"
+exports.version = '0.1.0'
 
 #
 # Sets up a new RedisFs instance.  
@@ -13,7 +13,7 @@ exports.version = "0.1.0"
 #   dir       - Optional path to write files out to.
 #           
 exports.redisfs = (options) ->
-  new exports.RedisFs options or {}
+  new exports.RedisFs options
 
 # 
 # Dependencies
@@ -23,16 +23,15 @@ fs    = require 'fs'
 temp  = require 'temp'
 uuid  = require 'node-uuid'
 redis = require 'redis'
-
-log = console.log
+log   = console.log
 
 #
 # Util to pump files in & out of redis.  
 #
 class RedisFs
-  constructor: (@redis = redis.createClient(), @keys[]) ->
+  constructor: (options = {}, @keys = []) ->
     @redis      = options.redis or connectToRedis options
-    @namespace ?= 'redisfs'
+    @namespace  = options.namespace or 'redisfs'
     @redis.select options.database if options.database?
     
   #
@@ -54,47 +53,48 @@ class RedisFs
     fs.readFile filename, encoding, (err, data) =>
       if err? then callback err else @set key, data, callback
 
-  #
-  # pumps a redis value to a file. takes the following config hash
-  #  - key      -> the redis key to fetch the value from
-  #  - filename -> optional filename to write to.  if ommitted
-  #                a temp file will be generated.
-  #  - encoding -> optional file encoding, defaults to utf8
-  #  - callback -> receives the and error as the first param
-  #                or a success hash that contains the path
-  #                and a fd to the file
-  #
-  redis2file: (args) ->
-    key      = args.key
-    filename = args.filename
-    encoding = args.encoding or 'utf8'    
-    callback = args.callback
-    @get key, (err, value) =>
-      if err? then callback err else write filename, value, encoding, callback
+  # #
+  # # pumps a redis value to a file. takes the following config hash
+  # #  - key      -> the redis key to fetch the value from
+  # #  - filename -> optional filename to write to.  if ommitted
+  # #                a temp file will be generated.
+  # #  - encoding -> optional file encoding, defaults to utf8
+  # #  - callback -> receives the and error as the first param
+  # #                or a success hash that contains the path
+  # #                and a fd to the file
+  # #
+  # redis2file: (args) ->
+  #   key      = args.key
+  #   filename = args.filename
+  #   encoding = args.encoding or 'utf8'    
+  #   callback = args.callback
+  #   @get key, (err, value) =>
+  #     if err? then callback err else write filename, value, encoding, callback
 
-  #
-  # end the redis connection and del all the keys generated during
-  # the session (defaults to false).
-  #
-  end: (cleanup = false) ->
-    if cleanup
-      multi = @redis.multi() 
-      multi.del key for key in @keys
-      multi.exec (err, replies) =>
-        log "Unable to del all generated keys #{JSON.stringify replies}" if err?
-        @redis.quit()
-    else
-      @redis.quit()
+  # #
+  # # end the redis connection and del all the keys generated during
+  # # the session (defaults to false).
+  # #
+  # end: (cleanup = false) ->
+  #   if cleanup
+  #     multi = @redis.multi() 
+  #     multi.del key for key in @keys
+  #     multi.exec (err, replies) =>
+  #       log "Unable to del all generated keys #{JSON.stringify replies}" if err?
+  #       @redis.quit()
+  #   else
+  #     @redis.quit()
 
-  #
-  # @private
-  # gets the value of the key.  callback will receive the value.
-  #
-  get: (key, callback) ->
-    @redis.get key, (err, value) =>
-      if err? callback err else callback null, value
-
+  # #
+  # # @private
+  # # gets the value of the key.  callback will receive the value.
+  # #
+  # get: (key, callback) ->
+  #   @redis.get key, (err, value) =>
+  #     if err? callback err else callback null, value
   # 
+  # 
+
   # @private
   # sets the value to a new redis key.  callback will
   # receive the new key and the redis reply.
@@ -103,22 +103,22 @@ class RedisFs
     @redis.set key, value, (err, reply) =>
       if err? then callback err else callback null, {key: key, reply: reply}
 
-  #
-  # @private
-  # pumps a redis value into a generated temp file. callback will
-  # receive the filename
-  #
-  open: (key, callback) ->
-    temp.open 'redisfs', (err, file) =>
-      if err? then callback err else @redis2file key, file.path, callback
-
-  #
-  # @private
-  # write to a file
-  #
-  write: (filename, value, encoding, callback) -> 
-    fs.writeFile filename, value, encoding, (err) =>
-      if err? then callback err else callback filename
+  # #
+  # # @private
+  # # pumps a redis value into a generated temp file. callback will
+  # # receive the filename
+  # #
+  # open: (key, callback) ->
+  #   temp.open 'redisfs', (err, file) =>
+  #     if err? then callback err else @redis2file key, file.path, callback
+  # 
+  # #
+  # # @private
+  # # write to a file
+  # #
+  # write: (filename, value, encoding, callback) -> 
+  #   fs.writeFile filename, value, encoding, (err) =>
+  #     if err? then callback err else callback filename
   
 #
 # fetch a redis client
