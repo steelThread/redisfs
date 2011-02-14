@@ -37,53 +37,57 @@ class RedisFs
   #
   # pumps a file's contents into a redis key.  takes a arg hash:
   #  - filename -> the full path to the file to consume
-  #  - key      -> optional redis key.  if omitted a uuid will be 
-  #                generated.
-  #  - encoding -> optional file encoding, defaults to utf8.
+  #  - options  -> optional object with 2 members
+  #      key:      optional redis key.  if omitted a uuid will be generated.
+  #      encoding: optional file encoding, defaults to utf8.
   #  - callback -> recieves either an error as the first param 
   #                or success hash that contains the key and reply
   #                as the second param.
   #
-  file2redis: (args) ->
-    key      = args.key or "#{@namespace}:#{uuid()}"
-    filename = args.filename
-    encoding = args.encoding or 'utf8'    
-    callback = args.callback
-    @keys.push key unless args.key
+  file2redis: (filename, options, callback) ->
+    if _.isFunction options
+      console.log 'options is the callback'
+      callback = options
+      options = {}
+    key = options.key or "#{@namespace}:#{uuid()}"
+    encoding = options.encoding or 'utf8'    
+    @keys.push key unless options.key
     fs.readFile filename, encoding, (err, data) =>
       if err? then callback err else @set key, data, callback
 
   # #
   # # pumps a redis value to a file. takes the following config hash
   # #  - key      -> the redis key to fetch the value from
-  # #  - filename -> optional filename to write to.  if ommitted
+  # #  - options  -> optional object with 2 members
+  # #   filename:    optional filename to write to.  if ommitted
   # #                a temp file will be generated.
-  # #  - encoding -> optional file encoding, defaults to utf8
+  # #   encoding:    optional file encoding, defaults to utf8
   # #  - callback -> receives the and error as the first param
   # #                or a success hash that contains the path
   # #                and a fd to the file
   # #
-  # redis2file: (args) ->
-  #   key      = args.key
-  #   filename = args.filename
-  #   encoding = args.encoding or 'utf8'    
-  #   callback = args.callback
+  # redis2file: (key, options, callback) ->
+  #   if _.isFunction options
+  #     callback = options
+  #     options = {}
+  #   filename = options.filename or 'temp' # fix this
+  #   encoding = options.encoding or 'utf8'    
   #   @get key, (err, value) =>
   #     if err? then callback err else write filename, value, encoding, callback
 
-  # #
-  # # end the redis connection and del all the keys generated during
-  # # the session (defaults to false).
-  # #
-  # end: (cleanup = false) ->
-  #   if cleanup
-  #     multi = @redis.multi() 
-  #     multi.del key for key in @keys
-  #     multi.exec (err, replies) =>
-  #       log "Unable to del all generated keys #{JSON.stringify replies}" if err?
-  #       @redis.quit()
-  #   else
-  #     @redis.quit()
+  #
+  # end the redis connection and del all the keys generated during
+  # the session (defaults to false).
+  #
+  end: (cleanup = false) ->
+    if cleanup
+      multi = @redis.multi() 
+      multi.del key for key in @keys
+      multi.exec (err, replies) =>
+        log "Unable to del all generated keys #{JSON.stringify replies}" if err?
+        @redis.quit()
+    else
+      @redis.quit()
 
   # #
   # # @private
