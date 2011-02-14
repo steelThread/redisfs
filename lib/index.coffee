@@ -46,7 +46,6 @@ class RedisFs
   #
   file2redis: (filename, options, callback) ->
     if _.isFunction options
-      console.log 'options is the callback'
       callback = options
       options = {}
     key = options.key or "#{@namespace}:#{uuid()}"
@@ -55,50 +54,50 @@ class RedisFs
     fs.readFile filename, encoding, (err, data) =>
       if err? then callback err else @set key, data, callback
 
-  # #
-  # # pumps a redis value to a file. takes the following config hash
-  # #  - key      -> the redis key to fetch the value from
-  # #  - options  -> optional object with 2 members
-  # #   filename:    optional filename to write to.  if ommitted
-  # #                a temp file will be generated.
-  # #   encoding:    optional file encoding, defaults to utf8
-  # #  - callback -> receives the and error as the first param
-  # #                or a success hash that contains the path
-  # #                and a fd to the file
-  # #
-  # redis2file: (key, options, callback) ->
-  #   if _.isFunction options
-  #     callback = options
-  #     options = {}
-  #   filename = options.filename or 'temp' # fix this
-  #   encoding = options.encoding or 'utf8'    
-  #   @get key, (err, value) =>
-  #     if err? then callback err else write filename, value, encoding, callback
+  #
+  # pumps a redis value to a file. takes the following config hash
+  #  - key      -> the redis key to fetch the value from
+  #  - options  -> optional object with 2 members
+  #     filename:  optional filename to write to.  if ommitted
+  #                a temp file will be generated.
+  #     encoding:  optional file encoding, defaults to utf8
+  #  - callback -> receives the and error as the first param
+  #                or a success hash that contains the path
+  #                and a fd to the file
+  #
+  redis2file: (key, options, callback) ->
+    if _.isFunction options
+      callback = options
+      options = {}
+    filename = options.filename or 'temp' # fix this
+    encoding = options.encoding or 'utf8'    
+    @get key, (err, value) =>
+      if err? then callback err else write filename, value, encoding, callback
 
   #
   # end the redis connection and del all the keys generated during
   # the session (defaults to false).
   #
-  end: (cleanup = false) ->
+  end: (cleanup, callback) ->
     if cleanup
       multi = @redis.multi() 
       multi.del key for key in @keys
       multi.exec (err, replies) =>
         log "Unable to del all generated keys #{JSON.stringify replies}" if err?
+        callback(err, replies)
         @redis.quit()
     else
       @redis.quit()
 
-  # #
-  # # @private
-  # # gets the value of the key.  callback will receive the value.
-  # #
-  # get: (key, callback) ->
-  #   @redis.get key, (err, value) =>
-  #     if err? callback err else callback null, value
-  # 
-  # 
+  #
+  # @private
+  # gets the value of the key.  callback will receive the value.
+  #
+  get: (key, callback) ->
+    @redis.get key, (err, value) =>
+      if err? callback err else callback null, value
 
+  #  
   # @private
   # sets the value to a new redis key.  callback will
   # receive the new key and the redis reply.
@@ -107,22 +106,22 @@ class RedisFs
     @redis.set key, value, (err, reply) =>
       if err? then callback err else callback null, {key: key, reply: reply}
 
-  # #
-  # # @private
-  # # pumps a redis value into a generated temp file. callback will
-  # # receive the filename
-  # #
-  # open: (key, callback) ->
-  #   temp.open 'redisfs', (err, file) =>
-  #     if err? then callback err else @redis2file key, file.path, callback
-  # 
-  # #
-  # # @private
-  # # write to a file
-  # #
-  # write: (filename, value, encoding, callback) -> 
-  #   fs.writeFile filename, value, encoding, (err) =>
-  #     if err? then callback err else callback filename
+  #
+  # @private
+  # pumps a redis value into a generated temp file. callback will
+  # receive the filename
+  #
+  open: (key, callback) ->
+    temp.open 'redisfs', (err, file) =>
+      if err? then callback err else @redis2file key, file.path, callback
+  
+  #
+  # @private
+  # write to a file
+  #
+  write: (filename, value, encoding, callback) -> 
+    fs.writeFile filename, value, encoding, (err) =>
+      if err? then callback err else callback filename
   
 #
 # fetch a redis client
