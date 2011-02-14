@@ -39,5 +39,6 @@ vows.describe('RedisFs').addBatch(
       topic: (result) -> client.get(result.key, @callback)
       'should be test': (err, result) ->
         assert.equal 'test', result
+    teardown: -> client.flushdb()
 
 ).export module
