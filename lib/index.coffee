@@ -76,15 +76,18 @@ class RedisFs
 
   #
   # end the redis connection and del all the keys generated during
-  # the session (defaults to false).
+  # the session.  pass true as the first argument to cleanup the
+  # generated keys and an optional callback.  callback is not
+  # invoked cleanup is not on.
   #
   end: (cleanup, callback) ->
-    if cleanup
+    callback = cleanup if _.isFunction cleanup
+    if cleanup is on
       multi = @redis.multi() 
       multi.del key for key in @keys
       multi.exec (err, replies) =>
         log "Unable to del all generated keys #{JSON.stringify replies}" if err?
-        callback(err, replies)
+        callback(err, replies) if callback?
         @redis.quit()
     else
       @redis.quit()
