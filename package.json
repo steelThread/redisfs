@@ -1,0 +1,18 @@
+{
+  "name": "redisfs",
+  "description": "Utility for moving files in and out of Redis",
+  "version": "0.1.0",
+  "author": "Sean McDaniel <sean.mcdaniel@me.com>",
+  "contributors": [ 
+    {"name": "Sean McDaniel", "email": "sean.mcdaniel@me.com"}
+  ],
+  "dependencies": {
+	"redis":         ">= 0.5.2",
+	"node-uuid":     ">= 1.1.0",
+	"node-temp":     ">= 0.2.0",
+	"underscore":    ">= 1.1.4",
+    "coffee-script": ">= 1.0.0"
+  },
+  "directories": { "lib": "./lib" },
+  "engines": { "node": ">= 0.4.0" }
+}
