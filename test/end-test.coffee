@@ -7,13 +7,13 @@ redis    = fixture.redis
 
 vows.describe('end').addBatch(
   ##################################################
-  'end and cleanup':
+  'end and cleanup of generated keys':
     topic: -> fixture.file2redis 'test/fixture-file.txt', @callback
-    'returns the generated key to the callback': (err, result) ->
+    'create a key to test': (err, result) ->
       assert.ok result.key?
     'deletes generated key from redis': 
       topic: (result) -> fixture.end true, @callback
-      'replies with 1': (err, result) ->
+      'expecting a single key to be deleted': (err, result) ->
         assert.equal '1', result
     teardown: -> redis.flushdb()
 

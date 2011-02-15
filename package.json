@@ -7,11 +7,11 @@
     {"name": "Sean McDaniel", "email": "sean.mcdaniel@me.com"}
   ],
   "dependencies": {
-	"vows":          ">= 0.5.6",
-	"redis":         ">= 0.5.2",
-	"node-uuid":     ">= 1.1.0",
-	"node-temp":     ">= 0.2.0",
-	"underscore":    ">= 1.1.4",
+    "vows":          ">= 0.5.6",
+    "redis":         ">= 0.5.2",
+    "node-uuid":     ">= 1.1.0",
+    "node-temp":     ">= 0.2.0",
+    "underscore":    ">= 1.1.4",
     "coffee-script": ">= 1.0.0"
   },
   "directories": { "lib": "./lib" },
