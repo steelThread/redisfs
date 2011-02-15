@@ -129,7 +129,7 @@ class RedisFs
   #
   write: (filename, value, encoding, callback) -> 
     fs.writeFile filename, value, encoding, (err) =>
-      if err? then callback err else callback filename
+      if err? then callback err else callback null, filename
   
 #
 # fetch a redis client

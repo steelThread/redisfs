@@ -1,3 +1,4 @@
+fs        = require 'fs'
 vows      = require 'vows'
 redis     = require 'redis'
 assert    = require 'assert'
@@ -19,7 +20,7 @@ vows.describe('RedisFs').addBatch(
       assert.ok redisfs.redis?
     'uses redisfs is the namespace': (redisfs) -> 
       assert.equal 'redisfs', redisfs.namespace
-
+  
   ###################################################
   'construct with options':
     topic: redisfs(redis: client, namespace: 'test')
@@ -87,19 +88,21 @@ vows.describe('RedisFs').addBatch(
       assert.equal 'OK', result.reply
     'write to a temp file': 
       topic: (result) -> fixture.redis2file result.key, @callback
-      'should be test': (err, result) ->
-        assert.equal 'test', result
-      teardown: (result) -> client.flushdb()
+      'contents of resulting file':
+        topic: (result) -> fs.readFile result, 'utf8', @callback
+        'should be test': (data) ->
+          assert.equal 'test', data
+        teardown: (result) -> client.flushdb()
 
-  ##################################################
-  'end':
-    topic: -> fixture.file2redis './fixture-file.txt', @callback
-    'returns the generated key to the callback': (err, result) ->
-      assert.ok result.key?
-    'deletes generated key': 
-      topic: (result) -> fixture.end true, @callback
-      'replies with 1,1,1': (err, result) ->
-        assert.equal '1,1,1', result
-      teardown: -> client.flushdb()
+  # ##################################################
+  # 'end':
+  #   topic: -> fixture.file2redis './fixture-file.txt', @callback
+  #   'returns the generated key to the callback': (err, result) ->
+  #     assert.ok result.key?
+  #   'deletes generated key': 
+  #     topic: (result) -> fixture.end true, @callback
+  #     'replies with 1,1,1': (err, result) ->
+  #       assert.equal '1,1,1', result
+  #     teardown: -> client.flushdb()
 
 ).export module
