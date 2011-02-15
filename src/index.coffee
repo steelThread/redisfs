@@ -85,7 +85,7 @@ class RedisFs
   end: (cleanup, callback) ->
     callback = cleanup if _.isFunction cleanup
     if cleanup is on
-      multi = @redis.multi() 
+      multi = @redis.multi()
       multi.del key for key in @keys
       multi.exec (err, replies) =>
         log "Unable to del all generated keys #{JSON.stringify replies}" if err?
