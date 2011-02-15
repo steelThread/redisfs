@@ -80,6 +80,17 @@ vows.describe('RedisFs').addBatch(
         assert.equal result, new Buffer('test', "ascii").toString('base64')
       teardown: -> client.flushdb()
 
+  ###################################################
+  'redis2file with defaults':
+    topic: -> fixture.file2redis './fixture-file.txt', @callback
+    'generate a key': (err, result) ->
+      assert.equal 'OK', result.reply
+    'write to a temp file': 
+      topic: (result) -> fixture.redis2file result.key, @callback
+      'should be test': (err, result) ->
+        assert.equal 'test', result
+      teardown: (result) -> client.flushdb()
+
   ##################################################
   'end':
     topic: -> fixture.file2redis './fixture-file.txt', @callback
@@ -87,7 +98,7 @@ vows.describe('RedisFs').addBatch(
       assert.ok result.key?
     'deletes generated key': 
       topic: (result) -> fixture.end true, @callback
-      'deleted': (err, result) ->
+      'replies with 1,1,1': (err, result) ->
         assert.equal '1,1,1', result
       teardown: -> client.flushdb()
 

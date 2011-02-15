@@ -69,10 +69,12 @@ class RedisFs
     if _.isFunction options
       callback = options
       options = {}
-    filename = options.filename or 'temp' # fix this
     encoding = options.encoding or 'utf8'    
-    @get key, (err, value) =>
-      if err? then callback err else write filename, value, encoding, callback
+    if options.filename?
+      @get key, (err, value) =>
+        if err? then callback err else @write options.filename, value, encoding, callback
+    else
+      @open key, encoding, callback
 
   #
   # end the redis connection and del all the keys generated during
@@ -114,9 +116,12 @@ class RedisFs
   # pumps a redis value into a generated temp file. callback will
   # receive the filename
   #
-  open: (key, callback) ->
+  open: (key, encoding, callback) ->
     temp.open 'redisfs', (err, file) =>
-      if err? then callback err else @redis2file key, file.path, callback
+      if err? 
+        callback err 
+      else 
+        @redis2file key, {filename: file.path, encoding: encoding}, callback
   
   #
   # @private
