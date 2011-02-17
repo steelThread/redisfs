@@ -1,7 +1,9 @@
 exports.version = '0.1.0'
 
 #
-# Sets up a new RedisFs instance.
+# Sets up a new RedisFs instance.  Generated files and keys
+# are tracked so that they can be requested to be deleted at a
+# later time via the cleanup of end methods.
 #
 # options - Optional Hash of options.
 #   redis     - Existing instance of node_client.
@@ -28,10 +30,10 @@ redis = require 'redis'
 log   = console.log
 
 #
-# Util to pump files in & out of redis.
+# Util to pump files in & out of redis.  
 #
 class RedisFs
-  constructor: (options = {}, @keys = []) ->
+  constructor: (options = {}, @keys = [], @files = []) ->
     @redis      = options.redis or connectToRedis options
     @namespace  = options.namespace or 'redisfs'
     @redis.select options.database if options.database?
@@ -39,7 +41,7 @@ class RedisFs
   #
   # Pumps a file's contents into a redis key. 
   #   filename   - The full path to the file to consume
-  #   options    -  
+  #   options    - 
   #     key      - Optional redis key.  If omitted a key will be 
   #                generated using a uuid.
   #     encoding - Optional file encoding, defaults to utf8.
@@ -50,7 +52,7 @@ class RedisFs
   file2redis: (filename, options, callback) ->
     if _.isFunction options
       callback = options
-      options = {}
+      options  = {}
     key = options.key or "#{@namespace}:#{uuid()}"
     encoding = options.encoding or 'utf8'
     @keys.push key unless options.key
@@ -65,12 +67,13 @@ class RedisFs
   #                preexisting and writable.  If ommitted a temp file 
   #                will be generated.
   #     dir      - Optional path to write files out to for generated files.
-  #                This overrides the instance level options is specified.
+  #                This overrides the instance level options if specified.
   #     prefix   - Optional prefix to use for generated files.
-  #                This overrides the instance level options is specified.
+  #                This overrides the instance level options if specified.
   #     suffix   - Optional suffix to use for generated files. 
-  #                This overrides the instance level options is specified.
+  #                This overrides the instance level options if specified.
   #     encoding - Optional file encoding, defaults to utf8
+  #                This overrides the instance level options if specified.
   #   callback   - Receives the and error as the first param
   #                or a success hash that contains the path
   #                and a fd to the file.
@@ -78,19 +81,41 @@ class RedisFs
   redis2file: (key, options, callback) ->
     if _.isFunction options
       callback = options
-      options = {}
+      options  = {}
     encoding = options.encoding or 'utf8'
     if options.filename?
       @get key, (err, value) =>
-        if err? then callback err else @write options.filename, value, encoding, callback
+        if err? then callback err 
+        else 
+          @write options.filename, value, encoding, callback
     else
       @open key, encoding, callback
 
   #
-  # end the redis connection and del all the keys generated during
-  # the session.  pass true as the first argument to cleanup the
-  # generated keys and an optional callback.  callback is not
-  # invoked cleanup is not on.
+  # Delete generated resources.
+  #   options - Optional object indicating which generated resources to 
+  #             delete. Omission of options will result
+  #             in the deletion of both files and keys 
+  #             should be deleted.
+  #     files - Optional boolean indicating whether generated files 
+  #             should be deleted.
+  #     keys  - Optional boolean indicating whether files should be
+  #             deleted.
+  #
+  cleanup: (options) ->
+    both   = on unless options?
+    both or= options?.keys and options?.files
+    keys   = if both then on else options?.keys  or off
+    files  = if both then on else options?.files or off
+
+    @deleteKeys  if keys
+    @deleteFiles if files
+
+  #
+  # End the redis connection and deletes all the generated during
+  # the session.  Pass true as the first argument to cleanup the
+  # generated keys and files with an optional callback.  Callback is not
+  # invoked unless cleanup is requested.
   #
   end: (cleanup, callback) ->
     callback = cleanup if _.isFunction cleanup
@@ -128,9 +153,9 @@ class RedisFs
   #
   open: (key, encoding, callback) ->
     temp.open 'redisfs', (err, file) =>
-      if err?
-        callback err
+      if err? then callback err
       else
+        @files.push file.path
         @redis2file key, {filename: file.path, encoding: encoding}, callback
 
   #
@@ -140,6 +165,24 @@ class RedisFs
   write: (filename, value, encoding, callback) ->
     fs.writeFile filename, value, encoding, (err) =>
       if err? then callback err else callback null, filename
+
+  #
+  # @private
+  # Delete all the generated keys in a multi op.  Errors are ignored.
+  #
+  deleteKeys: ->
+    multi = @redis.multi()
+    multi.del key for key in @keys
+    multi.exec()
+    @keys = []
+    
+  #
+  # @private
+  # Delete all the generated files.  Errors are ignored.
+  #
+  deleteFiles: ->
+    fs.unlink file for file in @files
+    @files = []
 
 #
 # fetch a redis client
