@@ -10,7 +10,9 @@ exports.version = '0.1.0'
 #   namespace - String namespace prefix for generated Redis keys.
 #               (Default: redisfs).
 #   database  - Optional Integer of the Redis database to select.
-#   dir       - Optional path to write files out to.
+#   dir       - Optional path to write files out to for generated files.
+#   prefix    - Optional prefix to use for generated files.
+#   suffix    - Optional suffix to use for generated files. 
 #
 exports.redisfs = (options) ->
   new exports.RedisFs options
@@ -35,12 +37,13 @@ class RedisFs
     @redis.select options.database if options.database?
 
   #
-  # pumps a file's contents into a redis key.  takes a arg hash:
-  #  - filename -> the full path to the file to consume
-  #  - options  -> optional object with 2 members
-  #      key:      optional redis key.  if omitted a uuid will be generated.
-  #      encoding: optional file encoding, defaults to utf8.
-  #  - callback -> recieves either an error as the first param
+  # Pumps a file's contents into a redis key. 
+  #   filename   - The full path to the file to consume
+  #   options    -  
+  #     key      - Optional redis key.  If omitted a key will be 
+  #                generated using a uuid.
+  #     encoding - Optional file encoding, defaults to utf8.
+  #   callback   - Recieves either an error as the first param
   #                or success hash that contains the key and reply
   #                as the second param.
   #
@@ -55,15 +58,22 @@ class RedisFs
       if err? then callback err else @set key, data, callback
 
   #
-  # pumps a redis value to a file. takes the following config hash
-  #  - key      -> the redis key to fetch the value from
-  #  - options  -> optional object with 2 members
-  #     filename:  optional filename to write to.  if ommitted
-  #                a temp file will be generated.
-  #     encoding:  optional file encoding, defaults to utf8
-  #  - callback -> receives the and error as the first param
+  # Pumps a redis value to a file. 
+  #   key        - The redis key to fetch.
+  #   options
+  #     filename - Optional filename to write to. assumes the file is
+  #                preexisting and writable.  If ommitted a temp file 
+  #                will be generated.
+  #     dir      - Optional path to write files out to for generated files.
+  #                This overrides the instance level options is specified.
+  #     prefix   - Optional prefix to use for generated files.
+  #                This overrides the instance level options is specified.
+  #     suffix   - Optional suffix to use for generated files. 
+  #                This overrides the instance level options is specified.
+  #     encoding - Optional file encoding, defaults to utf8
+  #   callback   - Receives the and error as the first param
   #                or a success hash that contains the path
-  #                and a fd to the file
+  #                and a fd to the file.
   #
   redis2file: (key, options, callback) ->
     if _.isFunction options
