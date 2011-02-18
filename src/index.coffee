@@ -70,7 +70,7 @@ class RedisFs
       if err? then callback err 
       else 
         @set key, data, callback
-        #@deleteFiles [filename]
+        @deleteFiles [filename]
 
   #
   # Pumps a redis value to a file and deletes the redis key.

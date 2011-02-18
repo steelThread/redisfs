@@ -1,14 +1,19 @@
 vows      = require 'vows'
 assert    = require 'assert'
+{setup}   = require './helper'
 {redisfs} = require '../src/index.coffee'
 
+
 fixture  = redisfs()
-redis    = fixture.redis
+
+# start clean
+redis = fixture.redis
+redis.flushdb()
 
 vows.describe('end').addBatch(
   ##################################################
   'end and cleanup of generated keys':
-    topic: -> fixture.file2redis 'test/fixture-file.txt', @callback
+    topic: -> setup (err, file) => fixture.file2redis file, @callback
     'create a key to test': (err, result) ->
       assert.ok result.key?
     'deletes generated key from redis': 

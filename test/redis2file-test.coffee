@@ -1,6 +1,7 @@
 fs        = require 'fs'
 vows      = require 'vows'
 assert    = require 'assert'
+{setup}    = require './helper'
 {redisfs} = require '../src/index.coffee'
 
 fixture  = redisfs()
@@ -12,7 +13,7 @@ redis.flushdb()
 vows.describe('redis2file').addBatch(
   ###################################################
   'redis2file with defaults':
-    topic: -> fixture.file2redis 'test/fixture-file.txt', @callback
+    topic: -> setup (err, file) => fixture.file2redis file, @callback
     'generates a file': (err, result) ->
       assert.equal 'OK', result.reply
     'writes to a temp file':
