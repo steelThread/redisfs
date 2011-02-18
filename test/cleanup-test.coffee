@@ -7,9 +7,9 @@ assert    = require 'assert'
 
 redisfs = redisfs()
 
-vows.describe('end').addBatch(
+vows.describe('cleanup').addBatch(
   ##################################################
-  'end will cleanup generated keys by default':
+  'cleanup generated keys and files by default':
     topic: -> setup (err, file) => redisfs.file2redis file, @callback
     'create a key to test': (err, result) ->
       assert.ok result.key?
@@ -19,9 +19,6 @@ vows.describe('end').addBatch(
         redis.exists result.key, @callback
       'key is deleted from redis': (err, result) ->
         assert.equal '0', result
-      'key tracking array is emptied': (err, result) ->
-        console.log "keys #{redisfs.keys}"
-        assert.equal '0', redisfs.keys.length
     teardown: -> teardown()
 
 ).export module

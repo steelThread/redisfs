@@ -70,7 +70,7 @@ class RedisFs
       if err? then callback err 
       else 
         @set key, data, callback
-        @deleteFiles [filename]
+        @deleteFiles [pop @files, filename]
 
   #
   # Pumps a redis value to a file and deletes the redis key.
@@ -106,7 +106,7 @@ class RedisFs
         if err? then callback err 
         else
           @write options.filename, value, encoding, callback
-          @deleteKeys [key] 
+          @deleteKeys [pop @keys, key] 
     else
       @open key, encoding, callback
 
@@ -126,26 +126,19 @@ class RedisFs
     keys   = if both then on else options?.keys  or off
     files  = if both then on else options?.files or off
 
-    @deleteKeys  if keys
-    @deleteFiles if files
+    @deleteKeys()  if keys
+    @deleteFiles() if files
 
   #
-  # End the redis connection and deletes all the generated during
-  # the session.  Pass true as the first argument to cleanup the
-  # generated keys and files with an optional callback.  Callback is not
-  # invoked unless cleanup is requested.
+  # End the redis connection and deletes all the resources generated during
+  # the session.  
+  #  options - Optional object see cleanup.  Omission of this will result in both
+  #            generated keys and files will be deleted. Passing a false
+  #            will prevent any deletiion
   #
-  end: (cleanup, callback) ->
-    callback = cleanup if _.isFunction cleanup
-    if cleanup is on
-      multi = @redis.multi()
-      multi.del key for key in @keys
-      multi.exec (err, replies) =>
-        log "Unable to del all generated keys #{JSON.stringify replies}" if err?
-        callback(err, replies) if callback?
-        @redis.quit()
-    else
-      @redis.quit()
+  end: (options) ->
+    @cleanup options unless options is off
+    @redis.quit()
 
   #
   # @private
@@ -188,24 +181,34 @@ class RedisFs
   # @private
   # Delete all the generated keys in a multi op.  Errors are ignored.
   #
-  deleteKeys: (keys = @fkeys) ->
+  deleteKeys: (keys = @keys) ->
     multi = @redis.multi()
     multi.del key for key in keys
     multi.exec()
-    keys = []
+    @keys = [] if @keys is keys
     
   #
   # @private
   # Delete all the generated files.  Errors are ignored.
   #
-  deleteFiles: (files = @files)->
+  deleteFiles: (files = @files) ->
     fs.unlink file for file in files
-    files = []
+    @files = [] if @files is files
 
 #
 # fetch a redis client
 #
 connectToRedis = (options) ->
   redis.createClient options.port, options.host
+
+#
+# Pops any element on an array.
+#
+pop = (array, value) ->
+  index = array.indexOf value
+  if index
+    swap = array.pop()
+    array[index] = swap unless swap is value
+  value
 
 exports.RedisFs = RedisFs

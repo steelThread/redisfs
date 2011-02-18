@@ -1,15 +1,11 @@
-fs        = require 'fs'
 vows      = require 'vows'
-redis     = require 'redis'
 assert    = require 'assert'
 {redisfs} = require '../src/index.coffee'
-
-fixture  = redisfs()
 
 vows.describe('construct').addBatch(
   ##################################################
   'construct with defaults':
-    topic: fixture,
+    topic: redisfs,
     'works': (redisfs) ->
       assert.ok redisfs?
     'connects to redis': (redisfs) ->
