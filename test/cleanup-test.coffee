@@ -19,6 +19,8 @@ vows.describe('cleanup').addBatch(
         redis.exists result.key, @callback
       'key is deleted from redis': (err, result) ->
         assert.equal '0', result
+      'key is no longer being tracked': (err, result) ->
+        assert.equal '0', redisfs.keys.length
     teardown: -> teardown()
 
 ).export module

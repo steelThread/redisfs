@@ -5,7 +5,7 @@ assert    = require 'assert'
 vows.describe('construct').addBatch(
   ##################################################
   'construct with defaults':
-    topic: redisfs,
+    topic: redisfs(),
     'works': (redisfs) ->
       assert.ok redisfs?
     'connects to redis': (redisfs) ->

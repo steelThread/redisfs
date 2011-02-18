@@ -36,13 +36,20 @@ uuid  = require 'node-uuid'
 redis = require 'redis'
 log   = console.log
 
+DEFAULTS = 
+  deleteKey:  true
+  deleteFile: true
+  encoding:   'utf8'
+  namespace:  'redisfs'
+  prefix:     'redisfs-'
+
 #
 # Util to pump files in & out of redis.  
 #
 class RedisFs
   constructor: (options = {}, @keys = [], @files = []) ->
+    _.extend @, _.extend DEFAULTS, options
     @redis      = options.redis or connectToRedis options
-    @namespace  = options.namespace or 'redisfs'
     @redis.select options.database if options.database?
 
   #
@@ -54,7 +61,7 @@ class RedisFs
   #     encoding - Optional file encoding, defaults to utf8.
   #   deleteFile - Optional boolean to indicate whether the file file
   #                should be deleted after it is pumped into redis.
-  #                (Default: false)
+  #                (Default: true)
   #   callback   - Recieves either an error as the first param
   #                or success hash that contains the key and reply
   #                as the second param.
@@ -64,13 +71,13 @@ class RedisFs
       callback = options
       options  = {}
     key = options.key or "#{@namespace}:#{uuid()}"
-    encoding = options.encoding or 'utf8'
+    encoding = options.encoding or @encoding
     @keys.push key unless options.key
     fs.readFile filename, encoding, (err, data) =>
       if err? then callback err 
       else 
         @set key, data, callback
-        @deleteFiles [pop @files, filename]
+        @deleteFiles [_.pop @files, filename]
 
   #
   # Pumps a redis value to a file and deletes the redis key.
@@ -100,13 +107,13 @@ class RedisFs
     if _.isFunction options
       callback = options
       options  = {}
-    encoding = options.encoding or 'utf8'
+    encoding = options.encoding or @encoding
     if options.filename?
       @get key, (err, value) =>
         if err? then callback err 
         else
           @write options.filename, value, encoding, callback
-          @deleteKeys [pop @keys, key] 
+          @deleteKeys [_.pop @keys, key] 
     else
       @open key, encoding, callback
 
@@ -204,11 +211,12 @@ connectToRedis = (options) ->
 #
 # Pops any element on an array.
 #
-pop = (array, value) ->
-  index = array.indexOf value
-  if index
-    swap = array.pop()
-    array[index] = swap unless swap is value
-  value
+_.mixin
+  pop: (array, value) ->
+    index = array.indexOf value
+    if index
+      swap = array.pop()
+      array[index] = swap unless swap is value
+    value
 
 exports.RedisFs = RedisFs

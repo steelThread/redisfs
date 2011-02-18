@@ -20,7 +20,6 @@ vows.describe('end').addBatch(
       'key is deleted from redis': (err, result) ->
         assert.equal '0', result
       'key tracking array is emptied': (err, result) ->
-        console.log "keys #{redisfs.keys}"
         assert.equal '0', redisfs.keys.length
     teardown: -> teardown()
 
