@@ -6,15 +6,20 @@ exports.version = '0.1.0'
 # later time via the cleanup of end methods.
 #
 # options - Optional Hash of options.
-#   redis     - Existing instance of node_client.
-#   host      - String Redis host.  (Default: Redis' default)
-#   port      - Integer Redis port.  (Default: Redis' default)
-#   namespace - String namespace prefix for generated Redis keys.
-#               (Default: redisfs).
-#   database  - Optional Integer of the Redis database to select.
-#   dir       - Optional path to write files out to for generated files.
-#   prefix    - Optional prefix to use for generated files.
-#   suffix    - Optional suffix to use for generated files. 
+#   redis      - Existing instance of node_client.
+#   host       - String Redis host.  (Default: Redis' default)
+#   port       - Integer Redis port.  (Default: Redis' default)
+#   namespace  - String namespace prefix for generated Redis keys.
+#                (Default: redisfs).
+#   database   - Optional Integer of the Redis database to select.
+#   dir        - Optional path to write files out to for generated files.
+#                (Default: your systems temporary directory)
+#   prefix     - Optional prefix to use for generated files.  (Default: 'redisfs')
+#   suffix     - Optional suffix to use for generated files. 
+#   deleteKey  - Optional boolean to indicate if the key should be
+#                deleted on a redis2file operation.  (Default: true)
+#   deleteFile - Optional boolean to indicate if the file should be
+#                deleted on a file2redis operation.  (Default: false)
 #
 exports.redisfs = (options) ->
   new exports.RedisFs options
@@ -45,6 +50,9 @@ class RedisFs
   #     key      - Optional redis key.  If omitted a key will be 
   #                generated using a uuid.
   #     encoding - Optional file encoding, defaults to utf8.
+  #   deleteFile - Optional boolean to indicate whether the file file
+  #                should be deleted after it is pumped into redis.
+  #                (Default: false)
   #   callback   - Recieves either an error as the first param
   #                or success hash that contains the key and reply
   #                as the second param.
@@ -63,20 +71,23 @@ class RedisFs
   # Pumps a redis value to a file. 
   #   key        - The redis key to fetch.
   #   options
-  #     filename - Optional filename to write to. assumes the file is
-  #                preexisting and writable.  If ommitted a temp file 
-  #                will be generated.
-  #     dir      - Optional path to write files out to for generated files.
-  #                This overrides the instance level options if specified.
-  #     prefix   - Optional prefix to use for generated files.
-  #                This overrides the instance level options if specified.
-  #     suffix   - Optional suffix to use for generated files. 
-  #                This overrides the instance level options if specified.
-  #     encoding - Optional file encoding, defaults to utf8
-  #                This overrides the instance level options if specified.
-  #   callback   - Receives the and error as the first param
-  #                or a success hash that contains the path
-  #                and a fd to the file.
+  #     deleteKey - Optional boolean to indicate if the key should be
+  #                 removed after the get operation.  (Default: to value
+  #                 set on instance)
+  #     filename  - Optional filename to write to. assumes the file is
+  #                 preexisting and writable.  If ommitted a temp file 
+  #                 will be generated.
+  #     dir       - Optional path to write files out to for generated files.
+  #                 This overrides the instance level options if specified.
+  #     prefix    - Optional prefix to use for generated files.
+  #                 This overrides the instance level options if specified.
+  #     suffix    - Optional suffix to use for generated files. 
+  #                 This overrides the instance level options if specified.
+  #     encoding  - Optional file encoding, defaults to utf8
+  #                 This overrides the instance level options if specified.
+  #   callback    - Receives the and error as the first param
+  #                 or a success hash that contains the path
+  #                 and a fd to the file.
   #
   redis2file: (key, options, callback) ->
     if _.isFunction options
@@ -94,9 +105,8 @@ class RedisFs
   #
   # Delete generated resources.
   #   options - Optional object indicating which generated resources to 
-  #             delete. Omission of options will result
-  #             in the deletion of both files and keys 
-  #             should be deleted.
+  #             delete (keys and/or files). Omission of options will result
+  #             in the deletion of both files and keys.
   #     files - Optional boolean indicating whether generated files 
   #             should be deleted.
   #     keys  - Optional boolean indicating whether files should be
