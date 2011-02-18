@@ -13,7 +13,7 @@ vows.describe('redis2file').addBatch(
   ###################################################
   'redis2file with defaults':
     topic: -> fixture.file2redis 'test/fixture-file.txt', @callback
-    'generates a key': (err, result) ->
+    'generates a file': (err, result) ->
       assert.equal 'OK', result.reply
     'writes to a temp file':
       topic: (result) -> fixture.redis2file result.key, @callback

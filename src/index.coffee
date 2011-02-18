@@ -6,20 +6,22 @@ exports.version = '0.1.0'
 # later time via the cleanup of end methods.
 #
 # options - Optional Hash of options.
-#   redis      - Existing instance of node_client.
-#   host       - String Redis host.  (Default: Redis' default)
-#   port       - Integer Redis port.  (Default: Redis' default)
-#   namespace  - String namespace prefix for generated Redis keys.
-#                (Default: redisfs).
-#   database   - Optional Integer of the Redis database to select.
-#   dir        - Optional path to write files out to for generated files.
-#                (Default: your systems temporary directory)
-#   prefix     - Optional prefix to use for generated files.  (Default: 'redisfs')
-#   suffix     - Optional suffix to use for generated files. 
-#   deleteKey  - Optional boolean to indicate if the key should be
-#                deleted on a redis2file operation.  (Default: true)
-#   deleteFile - Optional boolean to indicate if the file should be
-#                deleted on a file2redis operation.  (Default: false)
+#   redis        - Existing instance of node_client.
+#   host         - String Redis host.  (Default: Redis' default)
+#   port         - Integer Redis port.  (Default: Redis' default)
+#   namespace    - String namespace prefix for generated Redis keys.
+#                  (Default: redisfs).
+#   database     - Optional Integer of the Redis database to select.
+#   *dir         - Optional path to write files out to for generated files.
+#                 (Default: your systems temporary directory)
+#   *prefix     - Optional prefix to use for generated files.  (Default: 'redisfs')
+#   *suffix     - Optional suffix to use for generated files. 
+#   *deleteKey  - Optional boolean to indicate if the key should be
+#                 deleted on a redis2file operation.  (Default: true)
+#   *deleteFile - Optional boolean to indicate if the file should be
+#                 deleted on a file2redis operation.  (Default: true)
+#
+# Note: all params marked as * represent future implementations
 #
 exports.redisfs = (options) ->
   new exports.RedisFs options
@@ -44,7 +46,7 @@ class RedisFs
     @redis.select options.database if options.database?
 
   #
-  # Pumps a file's contents into a redis key. 
+  # Pumps a file's contents into a redis key and deletes the file. 
   #   filename   - The full path to the file to consume
   #   options    - 
   #     key      - Optional redis key.  If omitted a key will be 
@@ -65,29 +67,34 @@ class RedisFs
     encoding = options.encoding or 'utf8'
     @keys.push key unless options.key
     fs.readFile filename, encoding, (err, data) =>
-      if err? then callback err else @set key, data, callback
+      if err? then callback err 
+      else 
+        @set key, data, callback
+        #@deleteFiles [filename]
 
   #
-  # Pumps a redis value to a file. 
-  #   key        - The redis key to fetch.
+  # Pumps a redis value to a file and deletes the redis key.
+  #   key          - The redis key to fetch.
   #   options
-  #     deleteKey - Optional boolean to indicate if the key should be
-  #                 removed after the get operation.  (Default: to value
-  #                 set on instance)
-  #     filename  - Optional filename to write to. assumes the file is
-  #                 preexisting and writable.  If ommitted a temp file 
-  #                 will be generated.
-  #     dir       - Optional path to write files out to for generated files.
-  #                 This overrides the instance level options if specified.
-  #     prefix    - Optional prefix to use for generated files.
-  #                 This overrides the instance level options if specified.
-  #     suffix    - Optional suffix to use for generated files. 
-  #                 This overrides the instance level options if specified.
-  #     encoding  - Optional file encoding, defaults to utf8
-  #                 This overrides the instance level options if specified.
-  #   callback    - Receives the and error as the first param
-  #                 or a success hash that contains the path
-  #                 and a fd to the file.
+  #     filename   - Optional filename to write to. assumes the file is
+  #                  preexisting and writable.  If ommitted a temp file 
+  #                  will be generated.
+  #     encoding   - Optional file encoding, defaults to utf8
+  #                  This overrides the instance level options if specified.
+  #     *dir       - Optional path to write files out to for generated files.
+  #                  This overrides the instance level options if specified.
+  #     *prefix    - Optional prefix to use for generated files.
+  #                  This overrides the instance level options if specified.
+  #     *suffix    - Optional suffix to use for generated files. 
+  #                  This overrides the instance level options if specified.
+  #     *deleteKey - Optional boolean to indicate if the key should be
+  #                  removed after the get operation.  (Default: to value
+  #                  set on instance)
+  #   callback     - Receives the and error as the first param
+  #                  or a success hash that contains the path
+  #                  and a fd to the file.
+  #
+  # Note: all params marked as * represent future implementations
   #
   redis2file: (key, options, callback) ->
     if _.isFunction options
@@ -97,8 +104,9 @@ class RedisFs
     if options.filename?
       @get key, (err, value) =>
         if err? then callback err 
-        else 
+        else
           @write options.filename, value, encoding, callback
+          @deleteKeys [key] 
     else
       @open key, encoding, callback
 
@@ -141,7 +149,7 @@ class RedisFs
 
   #
   # @private
-  # gets the value of the key.  callback will receive the value.
+  # Fets the value of the key.  Callback will be passed the value.
   #
   get: (key, callback) ->
     @redis.get key, (err, value) =>
@@ -149,8 +157,8 @@ class RedisFs
 
   #
   # @private
-  # sets the value to a new redis key.  callback will
-  # receive the new key and the redis reply.
+  # Sets the value to a new redis key.  Callback will be passed
+  # a result object containing the key and the redis reply.
   #
   set: (key, value, callback) ->
     @redis.set key, value, (err, reply) =>
@@ -158,8 +166,8 @@ class RedisFs
 
   #
   # @private
-  # pumps a redis value into a generated temp file. callback will
-  # receive the filename
+  # Pumps a redis value into a generated temp file. Callback will
+  # receive the filename.
   #
   open: (key, encoding, callback) ->
     temp.open 'redisfs', (err, file) =>
@@ -170,7 +178,7 @@ class RedisFs
 
   #
   # @private
-  # write to a file
+  # Write to a file
   #
   write: (filename, value, encoding, callback) ->
     fs.writeFile filename, value, encoding, (err) =>
@@ -180,19 +188,19 @@ class RedisFs
   # @private
   # Delete all the generated keys in a multi op.  Errors are ignored.
   #
-  deleteKeys: ->
+  deleteKeys: (keys = @fkeys) ->
     multi = @redis.multi()
-    multi.del key for key in @keys
+    multi.del key for key in keys
     multi.exec()
-    @keys = []
+    keys = []
     
   #
   # @private
   # Delete all the generated files.  Errors are ignored.
   #
-  deleteFiles: ->
-    fs.unlink file for file in @files
-    @files = []
+  deleteFiles: (files = @files)->
+    fs.unlink file for file in files
+    files = []
 
 #
 # fetch a redis client
