@@ -36,6 +36,9 @@ uuid  = require 'node-uuid'
 redis = require 'redis'
 log   = console.log
 
+#
+# Option defaults
+#
 DEFAULTS = 
   deleteKey:  true
   deleteFile: true
@@ -49,7 +52,7 @@ DEFAULTS =
 class RedisFs
   constructor: (options = {}, @keys = [], @files = []) ->
     _.extend @, _.extend DEFAULTS, options
-    @redis      = options.redis or connectToRedis options
+    @redis = options.redis or connectToRedis options
     @redis.select options.database if options.database?
 
   #
@@ -67,16 +70,11 @@ class RedisFs
   #                as the second param.
   #
   file2redis: (filename, options, callback) ->
-    if _.isFunction options
-      callback = options
-      options  = {}
-    key = options.key or "#{@namespace}:#{uuid()}"
-    encoding = options.encoding or @encoding
-    @keys.push key unless options.key
-    fs.readFile filename, encoding, (err, data) =>
+    {options, callback} = parse options, callback
+    fs.readFile filename, options.encoding or @encoding, (err, data) =>
       if err? then callback err 
       else 
-        @set key, data, callback
+        @set options.key or @key(), data, callback
         @deleteFiles [_.pop @files, filename]
 
   #
@@ -104,9 +102,7 @@ class RedisFs
   # Note: all params marked as * represent future implementations
   #
   redis2file: (key, options, callback) ->
-    if _.isFunction options
-      callback = options
-      options  = {}
+    {options, callback} = parse options, callback
     encoding = options.encoding or @encoding
     if options.filename?
       @get key, (err, value) =>
@@ -166,6 +162,14 @@ class RedisFs
 
   #
   # @private
+  # Generate a new redis key
+  #
+  key: ->
+    @keys.push key = "#{@namespace}:#{uuid()}"
+    key       
+
+  #
+  # @private
   # Pumps a redis value into a generated temp file. Callback will
   # receive the filename.
   #
@@ -218,5 +222,12 @@ _.mixin
       swap = array.pop()
       array[index] = swap unless swap is value
     value
+
+#
+# Parse the optional options and callback
+#
+parse = (options, callback) ->
+  callback: if _.isFunction options then options else callback
+  options:  if _.isFunction options then {} else options
 
 exports.RedisFs = RedisFs
