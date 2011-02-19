@@ -56,17 +56,17 @@ class RedisFs
 
   #
   # Pumps a file's contents into a redis key and deletes the file. 
-  #   filename   - The full path to the file to consume
-  #   options    - 
-  #     key      - Optional redis key.  If omitted a key will be 
-  #                generated using a uuid.
-  #     encoding - Optional file encoding, defaults to utf8.
-  #   deleteFile - Optional boolean to indicate whether the file file
-  #                should be deleted after it is pumped into redis.
-  #                (Default: true)
-  #   callback   - Recieves either an error as the first param
-  #                or success hash that contains the key and reply
-  #                as the second param.
+  #   filename     - The full path to the file to consume
+  #   options       
+  #     key        - Optional redis key.  If omitted a key will be 
+  #                  generated using a uuid.
+  #     encoding   - Optional file encoding, defaults to utf8.
+  #     deleteFile - Optional boolean to indicate whether the file file
+  #                  should be deleted after it is pumped into redis.
+  #                  (Default: true)
+  #   callback     - Recieves either an error as the first param
+  #                  or success hash that contains the key and reply
+  #                  as the second param.
   #
   file2redis: (filename, options, callback) ->
     {options, callback} = @parse options, callback
@@ -74,7 +74,7 @@ class RedisFs
       if err? then callback err 
       else 
         @set options.key or @key(), data, callback
-        @deleteFiles [_.pop @files, filename] if options.deleteFile
+        @deleteFiles [_.pop @files, filename] if options.deleteFile is on
 
   #
   # Pumps a redis value to a file and deletes the redis key.
@@ -107,7 +107,7 @@ class RedisFs
         if err? then callback err 
         else
           @write options.filename, value, options.encoding, callback
-          @deleteKeys [_.pop @keys, key] if options.deleteKey
+          @deleteKeys _.pop @keys, key if options.deleteKey is on
     else
       @open key, options, callback
 
@@ -116,10 +116,10 @@ class RedisFs
   #   options - Optional object indicating which generated resources to 
   #             delete (keys and/or files). Omission of options will result
   #             in the deletion of both files and keys.
-  #     files - Optional boolean indicating whether generated files 
-  #             should be deleted.
   #     keys  - Optional boolean indicating whether files should be
   #             deleted.
+  #     files - Optional boolean indicating whether generated files 
+  #             should be deleted.
   #
   cleanup: (options) ->
     both   = on unless options?
@@ -202,10 +202,13 @@ class RedisFs
   # Delete all the generated keys in a multi op.  Errors are ignored.
   #
   deleteKeys: (keys = @keys) ->
-    multi = @redis.multi()
-    multi.del key for key in keys
-    multi.exec()
-    @keys = [] if @keys is keys
+    if _.isArray keys
+      multi = @redis.multi()
+      multi.del key for key in keys
+      multi.exec()
+      @keys = [] if @keys is keys
+    else
+      @redis.del keys
     
   #
   # @private
