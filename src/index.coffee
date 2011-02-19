@@ -132,10 +132,8 @@ class RedisFs
 
   #
   # End the redis connection and deletes all the resources generated during
-  # the session.  
-  #  options - Optional object see cleanup.  Omission of this will result in both
-  #            generated keys and files will be deleted. Passing a false
-  #            will prevent any deletiion
+  # the session.  Accepts the same args as cleanup.  To disable the cleanup
+  # pass false. 
   #
   end: (options) ->
     @cleanup options unless options is off
@@ -147,7 +145,7 @@ class RedisFs
   #
   get: (key, callback) ->
     @redis.get key, (err, value) =>
-      if err? callback err else callback null, value
+      callback err, value
 
   #
   # @private
@@ -195,7 +193,7 @@ class RedisFs
   #
   write: (filename, value, encoding, callback) ->
     fs.writeFile filename, value, encoding, (err) =>
-      if err? then callback err else callback null, filename
+      callback err, filename
 
   #
   # @private
