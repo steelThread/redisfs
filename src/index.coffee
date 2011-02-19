@@ -175,8 +175,8 @@ class RedisFs
     temp.open {prefix: options.prefix, suffix: options.suffix}, (err, file) =>
       if err? then callback err
       else
-        @files.push file.path
-        @redis2file key, {filename: file.path, encoding: options.encoding}, callback
+        @files.push options.filename = file.path
+        @redis2file key, options, callback
 
   #
   # @private
