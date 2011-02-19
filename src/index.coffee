@@ -57,7 +57,7 @@ class RedisFs
   #
   # Pumps a file's contents into a redis key and deletes the file. 
   #   filename     - The full path to the file to consume
-  #   options      - Optional options object. 
+  #   options      - Optional options object 
   #     key        - Optional redis key.  If omitted a key will be 
   #                  generated using the default namespace and a uuid.
   #     encoding   - Optional file encoding.
@@ -67,8 +67,8 @@ class RedisFs
   #                  or success hash that contains the key and reply
   #                  as the second param.
   #
-  file2redis: (filename, options, callback) ->
-    {options, callback} = @parse options, callback
+  file2redis: (filename, options..., callback) ->
+    options = @applyConfig options
     fs.readFile filename, options.encoding, (err, data) =>
       if err? then callback err 
       else 
@@ -99,8 +99,8 @@ class RedisFs
   #
   # Note: all params marked as * represent future implementations
   #
-  redis2file: (key, options, callback) ->
-    {options, callback} = @parse options, callback
+  redis2file: (key, options..., callback) ->
+    options = @applyConfig options
     if options.filename?
       @get key, (err, value) =>
         if err? then callback err 
@@ -153,7 +153,9 @@ class RedisFs
   #
   set: (key, value, callback) ->
     @redis.set key, value, (err, reply) =>
-      if err? then callback err else callback null, {key: key, reply: reply}
+      if err? then callback err 
+      else 
+        callback null, {key: key, reply: reply}
 
   #
   # @private
@@ -177,17 +179,14 @@ class RedisFs
 
   #
   # @private
-  # Parse the optional options and callback. The options are overlayed
-  # onto the @config to create the superset of options with the 
-  # appropriate defaults.  
+  # Overlayed the options onto the @config to create the 
+  # superset of options with the appropriate defaults.  
   #
-  parse: (options, callback) ->
-    callback = if _.isFunction options then options else callback
-    options = if _.isFunction options then {} else options
-    callback: callback, options: _.extend _.clone(@config), options
+  applyConfig: (options) ->
+    _.extend _.clone(@config), options[0]
 
   #
-  # @private
+  # @private 
   # Write to a file
   #
   write: (filename, value, encoding, callback) ->
