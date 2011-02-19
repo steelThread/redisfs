@@ -14,7 +14,7 @@ vows.describe('construct').addBatch(
       assert.equal redisfs.config.namespace, 'redisfs'
     'uses passed prefix': (redisfs) ->
       assert.equal redisfs.config.prefix, 'redisfs-'
-    'uses passed suffix': (redisfs) ->
+    'uses passed encoding': (redisfs) ->
       assert.equal redisfs.config.encoding, 'utf8'
 
   ####################################################
