@@ -63,7 +63,7 @@ the RedisFs constructor or the redisfs factory method.
 	#   callback     - Recieves either an error as the first param
 	#                  or success hash that contains the key and reply
 	#                  as the second param.
-	file2redis: (filename, options, callback) ->
+	file2redis: (filename, options..., callback) ->
 
     examples
 
@@ -107,7 +107,7 @@ the RedisFs constructor or the redisfs factory method.
 	#
 	# Note: all params marked as * represent future implementations
 	#
-	redis2file: (key, options, callback) ->
+	redis2file: (key, options..., callback) ->
 
     examples
 
