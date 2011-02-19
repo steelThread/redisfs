@@ -54,7 +54,7 @@ the RedisFs constructor or the redisfs factory method.
 
 	# Pumps a file's contents into a redis key and deletes the file. 
 	#   filename     - The full path to the file to consume
-	#   options      - Optional options object. 
+	#   options      - Optional hash of options. 
 	#     key        - Optional redis key.  If omitted a key will be 
 	#                  generated using the default namespace and a uuid.
 	#     encoding   - Optional file encoding.
@@ -86,7 +86,7 @@ the RedisFs constructor or the redisfs factory method.
 	#
 	# Pumps a redis value to a file and deletes the redis key.
 	#   key         - The redis key to fetch.
-	#   options     - Optional options object.
+	#   options     - Optional hash of options.
 	#     filename  - Optional filename to write to. assumes the file is
 	#                 preexisting and writable.  If ommitted a temp file 
 	#                 will be generated.
@@ -117,13 +117,21 @@ the RedisFs constructor or the redisfs factory method.
 	  console.log("output file: " + result);	
 	});
 
-    // full customization
+    // customization
     var options = {
 	  filename: 'myfile', 
 	  encoding: 'base64', 
-	  prefix: 'my-prefix-', 
-	  suffix: '.pgn', 
 	  deleteKey: false
+	};
+	redisfs.redis2file('my:key', options, function(err, result) {
+	  if (err) throw err;
+	  console.log("output file: " + result);	
+	});
+
+    // customization
+    var options = {
+	  prefix: 'my-file-prefix-', 
+	  suffix: '.txt'
 	};
 	redisfs.redis2file('my:key', options, function(err, result) {
 	  if (err) throw err;
