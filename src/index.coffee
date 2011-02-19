@@ -57,7 +57,7 @@ class RedisFs
   #
   # Pumps a file's contents into a redis key and deletes the file. 
   #   filename     - The full path to the file to consume
-  #   options       
+  #   options      - Optional options object. 
   #     key        - Optional redis key.  If omitted a key will be 
   #                  generated using the default namespace and a uuid.
   #     encoding   - Optional file encoding.
@@ -78,7 +78,7 @@ class RedisFs
   #
   # Pumps a redis value to a file and deletes the redis key.
   #   key         - The redis key to fetch.
-  #   options
+  #   options     - Optional options object.
   #     filename  - Optional filename to write to. assumes the file is
   #                 preexisting and writable.  If ommitted a temp file 
   #                 will be generated.

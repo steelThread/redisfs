@@ -17,19 +17,24 @@ RedisFs is a dead simple utility for moving files in and out of Redis.
 ### Configuration & Construction
 RedisFs supports the follow configuration options that can be passed into either
 the RedisFs constructor or the redisfs factory method.
-	redis      - Existing instance of node_redis.
-	host       - String Redis host.  (Default: Redis' default)
-	port       - Integer Redis port.  (Default: Redis' default)
-	namespace  - String namespace prefix for generated Redis keys. (Default: redisfs).
-	database   - Optional Integer of the Redis database to select.
-	*dir       - Optional path to write files out to for generated files.
-	             (Default: your systems temporary directory)
-	prefix     - Optional prefix to use for generated files.  (Default: 'redisfs')
-	suffix     - Optional suffix to use for generated files. 
-	deleteKey  - Optional boolean to indicate if the key should be
-	             deleted on a redis2file operation.  (Default: true)
-	deleteFile - Optional boolean to indicate if the file should be
-	             deleted on a file2redis operation.  (Default: true)
+	# options - Optional Hash of options.
+	#   redis      - Existing instance of node_client.
+	#   host       - String Redis host.  (Default: Redis' default)
+	#   port       - Integer Redis port.  (Default: Redis' default)
+	#   namespace  - String namespace prefix for generated Redis keys.
+	#                (Default: redisfs).
+	#   database   - Optional Integer of the Redis database to select.
+	#   *dir       - Optional path to write files out to for generated files.
+	#                (Default: your systems temporary directory)
+	#   prefix     - Optional prefix to use for generated files.  (Default: 'redisfs')
+	#   suffix     - Optional suffix to use for generated files. 
+	#   deleteKey  - Optional boolean to indicate if the key should be
+	#                deleted on a redis2file operation.  (Default: true)
+	#   deleteFile - Optional boolean to indicate if the file should be
+	#                deleted on a file2redis operation.  (Default: true)
+	#
+	# Note: all params marked as * represent future implementations
+	#
 	
 	examples
 	
@@ -72,12 +77,60 @@ the RedisFs constructor or the redisfs factory method.
 	
 	// specify a key and override the encoding and deletion defaults
 	var options = {key: 'my:key', encoding: 'base64', deleteFile: false};
-	redisfs.file2redis('/path/to/file, options, function(err, result) {
+	redisfs.file2redis('/path/to/file', options, function(err, result) {
 	  if (err) throw err;
 	  console.log("my redis key: " + result.key);	
 	  console.log("Redis output: " + result.reply);	
 	});
 	
+### redis2file
+	#
+	# Pumps a redis value to a file and deletes the redis key.
+	#   key         - The redis key to fetch.
+	#   options     - Optional options object.
+	#     filename  - Optional filename to write to. assumes the file is
+	#                 preexisting and writable.  If ommitted a temp file 
+	#                 will be generated.
+	#     encoding  - Optional file encoding, defaults to utf8
+	#                 This overrides the instance level options if specified.
+	#     *dir      - Optional path to write files out to for generated files.
+	#                 This overrides the instance level options if specified.
+	#     prefix    - Optional prefix to use for generated files.
+	#                 This overrides the instance level options if specified.
+	#     suffix    - Optional suffix to use for generated files. 
+	#                 This overrides the instance level options if specified.
+	#     deleteKey - Optional boolean to indicate if the key should be
+	#                 removed after the get operation.  (Default: to value
+	#                 set on instance)
+	#   callback    - Receives the and error as the first param
+	#                 or a success hash that contains the filename. 
+	#                 *the path and a fd to the file.
+	#
+	# Note: all params marked as * represent future implementations
+	#
+	redis2file: (key, options, callback) ->
+
+    examples
+
+    // defaults
+	redisfs.redis2file('my:key', function(err, result) {
+	  if (err) throw err;
+	  console.log("output file: " + result);	
+	});
+
+    // full customization
+    var options = {
+	  filename: 'myfile', 
+	  encoding: 'base64', 
+	  prefix: 'my-prefix-', 
+	  suffix: '.pgn', 
+	  deleteKey: false
+	};
+	redisfs.redis2file('my:key', options, function(err, result) {
+	  if (err) throw err;
+	  console.log("output file: " + result);	
+	});
+    
 
 ## License 
 
