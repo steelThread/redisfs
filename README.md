@@ -55,7 +55,7 @@ the RedisFs constructor or the redisfs factory method.
 
 	# Pumps a file's contents into a redis key and deletes the file. 
 	#   filename     - The full path to the file to consume
-	#   options       
+	#   options      - Optional options object. 
 	#     key        - Optional redis key.  If omitted a key will be 
 	#                  generated using the default namespace and a uuid.
 	#     encoding   - Optional file encoding.
@@ -130,8 +130,43 @@ the RedisFs constructor or the redisfs factory method.
 	  if (err) throw err;
 	  console.log("output file: " + result);	
 	});
-    
 
+
+### cleanup
+	#
+	# Delete generated resources.
+	#   options - Optional object indicating which generated resources to 
+	#             delete (keys and/or files). Omission of options will result
+	#             in the deletion of both files and keys.
+	#     keys  - Optional boolean indicating whether files should be
+	#             deleted.
+	#     files - Optional boolean indicating whether generated files 
+	#             should be deleted.
+	#
+    cleanup: (options) ->
+
+    examples
+
+    // defaults
+    redisfs.cleanup();
+
+    // delete keys but not files
+    redisfs.cleanup({files: false});
+    
+### end
+	#
+	# End the redis connection and deletes all the resources generated during
+	# the session.  Accepts the same args as cleanup.  To disable the cleanup
+	# pass false. 
+	#
+	end: (options) ->
+	
+	example
+	
+	redisfs.end();
+	redisfs.end(false);
+	redisfs.end({keys: true, files: false});
+    
 ## License 
 
 MIT License
