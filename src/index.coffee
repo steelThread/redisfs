@@ -51,7 +51,7 @@ DEFAULTS =
 #
 class RedisFs
   constructor: (options = {}, @keys = [], @files = [], @config = {}) ->
-    _.extend @config, _.clone(DEFAULTS), options
+    _.extend @config, _.extend _.clone(DEFAULTS), options
     @redis = options.redis or connectToRedis options
 
   #
@@ -69,7 +69,7 @@ class RedisFs
   #                as the second param.
   #
   file2redis: (filename, options, callback) ->
-    {options, callback} = parse options, callback
+    {options, callback} = @parse options, callback
     fs.readFile filename, options.encoding, (err, data) =>
       if err? then callback err 
       else 
@@ -101,7 +101,7 @@ class RedisFs
   # Note: all params marked as * represent future implementations
   #
   redis2file: (key, options, callback) ->
-    {options, callback} = parse options, callback
+    {options, callback} = @parse options, callback
     if options.filename?
       @get key, (err, value) =>
         if err? then callback err 
@@ -180,6 +180,18 @@ class RedisFs
 
   #
   # @private
+  # Parse the optional options and callback. The options are overlayed
+  # onto the @config to create the superset of options with the 
+  # appropriate defaults.  
+  #
+  parse: (options, callback) ->
+    callback = if _.isFunction options then options else callback
+    options = if _.isFunction options then {} else options
+    _.extend options, _.extend _.clone(@config), options
+    callback: callback, options: options
+
+  #
+  # @private
   # Write to a file
   #
   write: (filename, value, encoding, callback) ->
@@ -221,15 +233,5 @@ _.pop = (array, value) ->
     swap = array.pop()
     array[index] = swap unless swap is value
   value
-
-#
-# Parse the optional options and callback. The options are overlayed
-# onto the @config to create the superset of options with the 
-# appropriate defaults.
-#
-parse = (options, callback) ->
-  callback = if _.isFunction options then options else callback
-  options = if _.isFunction options then {} else options 
-  callback: callback, options: _.extend options, _.clone(@config), options
 
 exports.RedisFs = RedisFs
