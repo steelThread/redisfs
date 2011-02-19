@@ -6,17 +6,17 @@ exports.version = '0.1.0'
 # later time via the cleanup of end methods.
 #
 # options - Optional Hash of options.
-#   redis        - Existing instance of node_client.
-#   host         - String Redis host.  (Default: Redis' default)
-#   port         - Integer Redis port.  (Default: Redis' default)
-#   namespace    - String namespace prefix for generated Redis keys.
-#                  (Default: redisfs).
-#   database     - Optional Integer of the Redis database to select.
-#   *dir         - Optional path to write files out to for generated files.
+#   redis       - Existing instance of node_client.
+#   host        - String Redis host.  (Default: Redis' default)
+#   port        - Integer Redis port.  (Default: Redis' default)
+#   namespace   - String namespace prefix for generated Redis keys.
+#                 (Default: redisfs).
+#   database    - Optional Integer of the Redis database to select.
+#   *dir        - Optional path to write files out to for generated files.
 #                 (Default: your systems temporary directory)
-#   *prefix     - Optional prefix to use for generated files.  (Default: 'redisfs')
-#   *suffix     - Optional suffix to use for generated files. 
-#   *deleteKey  - Optional boolean to indicate if the key should be
+#   prefix      - Optional prefix to use for generated files.  (Default: 'redisfs')
+#   suffix      - Optional suffix to use for generated files. 
+#   deleteKey   - Optional boolean to indicate if the key should be
 #                 deleted on a redis2file operation.  (Default: true)
 #   *deleteFile - Optional boolean to indicate if the file should be
 #                 deleted on a file2redis operation.  (Default: true)
@@ -70,47 +70,46 @@ class RedisFs
   #
   file2redis: (filename, options, callback) ->
     {options, callback} = parse options, callback
-    fs.readFile filename, options.encoding or @config.encoding, (err, data) =>
+    fs.readFile filename, options.encoding, (err, data) =>
       if err? then callback err 
       else 
         @set options.key or @key(), data, callback
-        @deleteFiles [_.pop @files, filename]
+        @deleteFiles [_.pop @files, filename] if options.deleteFile
 
   #
   # Pumps a redis value to a file and deletes the redis key.
-  #   key          - The redis key to fetch.
+  #   key         - The redis key to fetch.
   #   options
-  #     filename   - Optional filename to write to. assumes the file is
-  #                  preexisting and writable.  If ommitted a temp file 
-  #                  will be generated.
-  #     encoding   - Optional file encoding, defaults to utf8
-  #                  This overrides the instance level options if specified.
-  #     *dir       - Optional path to write files out to for generated files.
-  #                  This overrides the instance level options if specified.
-  #     *prefix    - Optional prefix to use for generated files.
-  #                  This overrides the instance level options if specified.
-  #     *suffix    - Optional suffix to use for generated files. 
-  #                  This overrides the instance level options if specified.
-  #     *deleteKey - Optional boolean to indicate if the key should be
-  #                  removed after the get operation.  (Default: to value
-  #                  set on instance)
-  #   callback     - Receives the and error as the first param
-  #                  or a success hash that contains the path
-  #                  and a fd to the file.
+  #     filename  - Optional filename to write to. assumes the file is
+  #                 preexisting and writable.  If ommitted a temp file 
+  #                 will be generated.
+  #     encoding  - Optional file encoding, defaults to utf8
+  #                 This overrides the instance level options if specified.
+  #     *dir      - Optional path to write files out to for generated files.
+  #                 This overrides the instance level options if specified.
+  #     prefix    - Optional prefix to use for generated files.
+  #                 This overrides the instance level options if specified.
+  #     suffix    - Optional suffix to use for generated files. 
+  #                 This overrides the instance level options if specified.
+  #     deleteKey - Optional boolean to indicate if the key should be
+  #                 removed after the get operation.  (Default: to value
+  #                 set on instance)
+  #   callback    - Receives the and error as the first param
+  #                 or a success hash that contains the path
+  #                 and a fd to the file.
   #
   # Note: all params marked as * represent future implementations
   #
   redis2file: (key, options, callback) ->
     {options, callback} = parse options, callback
-    encoding = options.encoding or @config.encoding
     if options.filename?
       @get key, (err, value) =>
         if err? then callback err 
         else
-          @write options.filename, value, encoding, callback
-          @deleteKeys [_.pop @keys, key] 
+          @write options.filename, value, options.encoding, callback
+          @deleteKeys [_.pop @keys, key] if options.deleteKey
     else
-      @open key, encoding, callback
+      @open key, options, callback
 
   #
   # Delete generated resources.
@@ -172,12 +171,12 @@ class RedisFs
   # Pumps a redis value into a generated temp file. Callback will
   # receive the filename.
   #
-  open: (key, encoding, callback) ->
-    temp.open 'redisfs', (err, file) =>
+  open: (key, options, callback) ->
+    temp.open {prefix: options.prefix, suffix: options.suffix}, (err, file) =>
       if err? then callback err
       else
         @files.push file.path
-        @redis2file key, {filename: file.path, encoding: encoding}, callback
+        @redis2file key, {filename: file.path, encoding: options.encoding}, callback
 
   #
   # @private
@@ -206,7 +205,7 @@ class RedisFs
     @files = [] if @files is files
 
 #
-# fetch a redis client
+# Construct a redis client.
 #
 connectToRedis = (options) ->
   client = redis.createClient options.port, options.host
@@ -225,7 +224,8 @@ _.pop = (array, value) ->
 
 #
 # Parse the optional options and callback. The options are overlayed
-# onto the @config to create the superset of options
+# onto the @config to create the superset of options with the 
+# appropriate defaults.
 #
 parse = (options, callback) ->
   callback = if _.isFunction options then options else callback
