@@ -50,7 +50,7 @@ DEFAULTS =
 # Util to pump files in & out of redis.  
 #
 class RedisFs
-  constructor: (options = {}, @keys = [], @files = [], @config = {}) ->
+  constructor: (options = {}, @keys = [], @files = []) ->
     @config = _.extend _.clone(DEFAULTS), options
     @redis = options.redis or connectToRedis options
 
@@ -123,9 +123,9 @@ class RedisFs
   #
   cleanup: (options) ->
     both   = on unless options?
-    both or= options?.keys and options?.files
-    keys   = if both then on else options?.keys  or off
-    files  = if both then on else options?.files or off
+    both or= options.keys and options.files
+    keys   = if both then on else options.keys  or off
+    files  = if both then on else options.files or off
 
     @deleteKeys()  if keys
     @deleteFiles() if files
