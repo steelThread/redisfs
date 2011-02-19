@@ -50,10 +50,9 @@ DEFAULTS =
 # Util to pump files in & out of redis.  
 #
 class RedisFs
-  constructor: (options = {}, @keys = [], @files = []) ->
-    _.extend @, _.extend DEFAULTS, options
+  constructor: (options = {}, @keys = [], @files = [], @config = {}) ->
+    _.extend @config, _.clone(DEFAULTS), options
     @redis = options.redis or connectToRedis options
-    @redis.select options.database if options.database?
 
   #
   # Pumps a file's contents into a redis key and deletes the file. 
@@ -71,7 +70,7 @@ class RedisFs
   #
   file2redis: (filename, options, callback) ->
     {options, callback} = parse options, callback
-    fs.readFile filename, options.encoding or @encoding, (err, data) =>
+    fs.readFile filename, options.encoding or @config.encoding, (err, data) =>
       if err? then callback err 
       else 
         @set options.key or @key(), data, callback
@@ -103,7 +102,7 @@ class RedisFs
   #
   redis2file: (key, options, callback) ->
     {options, callback} = parse options, callback
-    encoding = options.encoding or @encoding
+    encoding = options.encoding or @config.encoding
     if options.filename?
       @get key, (err, value) =>
         if err? then callback err 
@@ -165,7 +164,7 @@ class RedisFs
   # Generate a new redis key
   #
   key: ->
-    @keys.push key = "#{@namespace}:#{uuid()}"
+    @keys.push key = "#{@config.namespace}:#{uuid()}"
     key       
 
   #
@@ -210,24 +209,27 @@ class RedisFs
 # fetch a redis client
 #
 connectToRedis = (options) ->
-  redis.createClient options.port, options.host
+  client = redis.createClient options.port, options.host
+  client.select options.database if options.database?
+  client
 
 #
 # Pops any element on an array.
 #
-_.mixin
-  pop: (array, value) ->
-    index = array.indexOf value
-    if index
-      swap = array.pop()
-      array[index] = swap unless swap is value
-    value
+_.pop = (array, value) ->
+  index = array.indexOf value
+  if index
+    swap = array.pop()
+    array[index] = swap unless swap is value
+  value
 
 #
-# Parse the optional options and callback
+# Parse the optional options and callback. The options are overlayed
+# onto the @config to create the superset of options
 #
 parse = (options, callback) ->
-  callback: if _.isFunction options then options else callback
-  options:  if _.isFunction options then {} else options
+  callback = if _.isFunction options then options else callback
+  options = if _.isFunction options then {} else options 
+  callback: callback, options: _.extend options, _.clone(@config), options
 
 exports.RedisFs = RedisFs
