@@ -3,9 +3,8 @@
 	| |_) / _ \/ _` | / __| |_ / __|
 	|  _ <  __/ (_| | \__ \  _|\__ \
 	|_| \_\___|\__,_|_|___/_|  |___/
+	
 
-
-Simple utility for pumping files in and out of Redis.
 
 ## About
 RedisFs is a dead simple utility for moving files in and out of Redis.  
@@ -131,7 +130,6 @@ the RedisFs constructor or the redisfs factory method.
 	  console.log("output file: " + result);	
 	});
 
-
 ### cleanup
 	#
 	# Delete generated resources.
@@ -161,7 +159,7 @@ the RedisFs constructor or the redisfs factory method.
 	#
 	end: (options) ->
 	
-	example
+	examples
 	
 	redisfs.end();
 	redisfs.end(false);
