@@ -51,7 +51,7 @@ DEFAULTS =
 #
 class RedisFs
   constructor: (options = {}, @keys = [], @files = [], @config = {}) ->
-    _.extend @config, _.extend _.clone(DEFAULTS), options
+    @config = _.extend _.clone(DEFAULTS), options
     @redis = options.redis or connectToRedis options
 
   #
@@ -187,8 +187,7 @@ class RedisFs
   parse: (options, callback) ->
     callback = if _.isFunction options then options else callback
     options = if _.isFunction options then {} else options
-    _.extend options, _.extend _.clone(@config), options
-    callback: callback, options: options
+    callback: callback, options: _.extend _.clone(@config), options
 
   #
   # @private
