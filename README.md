@@ -10,11 +10,11 @@ Simple utility for pumping files in and out of Redis.
 ## About
 RedisFs is a dead simple utility for moving files in and out of Redis.  
 
-### Installing
+## Installing
 	$ npm install redisfs
  
 ## Usage
-# Configuration
+### Configuration & Construction
 RedisFs supports the follow configuration options that can be passed into either
 the RedisFs constructor or the redisfs factory method.
 	redis      - Existing instance of node_redis.
@@ -30,40 +30,52 @@ the RedisFs constructor or the redisfs factory method.
 	             deleted on a redis2file operation.  (Default: true)
 	deleteFile - Optional boolean to indicate if the file should be
 	             deleted on a file2redis operation.  (Default: true)
+	
+	examples
+	
+	// defaults
+    var redisfs = require('redisfs').redisfs();	
 
-# file2redis 
+    // full customization
+    var redis = require('redisfs').redisfs({
+	  redis: clientInstance,
+	  namespace: 'my:namespace',
+	  prefix: 'my-prefix-',
+	  suffix: '.pdf',
+	  deleteKey: false,
+	  deleteFile: false
+	});
 
-	#
+### file2redis 
+
 	# Pumps a file's contents into a redis key and deletes the file. 
 	#   filename     - The full path to the file to consume
 	#   options       
 	#     key        - Optional redis key.  If omitted a key will be 
-	#                  generated using a uuid.
-	#     encoding   - Optional file encoding, defaults to utf8.
+	#                  generated using the default namespace and a uuid.
+	#     encoding   - Optional file encoding.
 	#     deleteFile - Optional boolean to indicate whether the file file
 	#                  should be deleted after it is pumped into redis.
-	#                  (Default: true)
 	#   callback     - Recieves either an error as the first param
 	#                  or success hash that contains the key and reply
 	#                  as the second param.
-	#
 	file2redis: (filename, options, callback) ->
 
     examples
 
     // defaults
 	redisfs.file2redis('/path/to/file, function(err, result) {
-	   if (err) throw err;
-	   console.log("Generated redis key: " + result.key);	
-	   console.log("Redis output: " + result.reply);	
+	  if (err) throw err;
+	  console.log("Generated redis key: " + result.key);	
+	  console.log("Redis output: " + result.reply);	
 	});
 	
-	// specify a key and override the encoding and deletion behaviors
+	// specify a key and override the encoding and deletion defaults
 	var options = {key: 'my:key', encoding: 'base64', deleteFile: false};
 	redisfs.file2redis('/path/to/file, options, function(err, result) {
-	   if (err) throw err;
-	   console.log("Generated redis key: " + result.key);	
-	   console.log("Redis output: " + result.reply);	
+	  if (err) throw err;
+	  console.log("my redis key: " + result.key);	
+	  console.log("Redis output: " + result.reply);	
 	});
 	
 

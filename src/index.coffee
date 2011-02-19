@@ -59,11 +59,10 @@ class RedisFs
   #   filename     - The full path to the file to consume
   #   options       
   #     key        - Optional redis key.  If omitted a key will be 
-  #                  generated using a uuid.
-  #     encoding   - Optional file encoding, defaults to utf8.
+  #                  generated using the default namespace and a uuid.
+  #     encoding   - Optional file encoding.
   #     deleteFile - Optional boolean to indicate whether the file file
   #                  should be deleted after it is pumped into redis.
-  #                  (Default: true)
   #   callback     - Recieves either an error as the first param
   #                  or success hash that contains the key and reply
   #                  as the second param.
