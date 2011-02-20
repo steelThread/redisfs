@@ -73,7 +73,7 @@ class RedisFs
       if err? then callback err 
       else 
         @set options.key or @key(), data, callback
-        @deleteFiles [_.pop @files, filename] if options.deleteFile is on
+        @deleteFiles [_.remove filename, @files] if options.deleteFile is on
 
   #
   # Pumps a redis value to a file and deletes the redis key.
@@ -106,7 +106,7 @@ class RedisFs
         if err? then callback err 
         else
           @write options.filename, value, options.encoding, callback
-          @deleteKeys _.pop @keys, key if options.deleteKey is on
+          @deleteKeys _.remove key, @keys if options.deleteKey is on
     else
       @open key, options, callback
 
@@ -223,9 +223,10 @@ connectToRedis = (options) ->
   client
 
 #
-# _ expando. Pops any element in an array.
+# _ expando. Remove any element in an array and compact it.  Similar to without
+# but done inline.  Returns the passed value.
 #
-_.pop = (array, value) ->
+_.remove = (value, array) ->
   index = array.indexOf value
   if index
     swap = array.pop()
