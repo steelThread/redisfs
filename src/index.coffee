@@ -223,12 +223,12 @@ connectToRedis = (options) ->
   client
 
 #
-# _ expando. Remove any element in an array and compact it.  Similar to without
+# _ expando. Remove any element (first occurance) in an array and compacts it.  Similar to without
 # but done inline.  Returns the passed value.
 #
 _.remove = (value, array) ->
   index = array.indexOf value
-  if index
+  if index isnt -1
     swap = array.pop()
     array[index] = swap unless swap is value
   value
