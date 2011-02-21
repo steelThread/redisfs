@@ -35,4 +35,8 @@ if args.length is 0 and argv.length is 0
 
 log parser.help() if options.help
 log "v#{redisfs.version}" if options.version
-#mimeograph.start args[0] if args[0]
+
+if args[0]
+  redisfs = redisfs.redisfs();
+  redisfs.redis2file args[0], (err, result) ->
+    if err? log err else log "File: #{result}"

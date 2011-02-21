@@ -18,9 +18,9 @@ usage = '''
 switches = [
   ['-h', '--help', 'Displays options']
   ['-v', '--version', "Shows file2redis' version."]
-  ['-k', '--key', "The key to set. (Defaults: generated key)"]
-  ['-e', '--encoding', "The encoding to use. (Defaults: utf8)"]
-  ['-d', '--delete', "Indicator to delete the file after the op. (Defaults: false)"]
+  ['-k', '--key [STRING]', "The key to set. (Defaults: generated key)"]
+  ['-e', '--encoding [STRING]', "The encoding to use. (Defaults: utf8)"]
+  ['-d', '--deleteFile', "Indicator to delete the file after the op. (Defaults: false)"]
 ]
 
 argv = process.argv[2..]
@@ -35,4 +35,12 @@ if args.length is 0 and argv.length is 0
 
 log parser.help() if options.help
 log "v#{redisfs.version}" if options.version
-#mimeograph.start args[0] if args[0]
+if args[0]
+  redisfs = redisfs.redisfs
+    key: options.key if options.key? 
+    encoding: options.encoding if options.encoding?
+    deleteFile: options.deleteFile or off
+
+  redisfs.file2redis args[0], (err, result) ->
+    if err? then log "error: #{err}" else log "#{result.reply}  key -> #{result.key}"
+    redisfs.end false
