@@ -47,7 +47,7 @@ in your node scripts.
 	  -d, --deleteKey    Indicator to delete the key after the op. (Defaults: false)
 
     $  redis2file -e base64 -f test/test.pdf redisfs:A8D367BD-1CE7-4FB3-9F90-2E94AF25430C
-	>> file -> test/test.pdf
+	>> OK  file -> test/test.pdf
 
 ## Using redisfs programmatically.
 ### Configuration & Construction
