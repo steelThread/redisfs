@@ -6,13 +6,47 @@
 	
 
 
-## About
+# About
 RedisFs is a dead simple utility for moving files in and out of Redis.  
 
-## Installing
+# Installing
 	$ npm install redisfs
  
-## Usage
+# Usage
+There are two ways to use redisfs via the command line interface or programmatically
+in your node scripts.
+
+## Using redisfs from the command line.
+### file2redis
+	Usage:
+	  file2redis [OPTIONS] path
+
+	Available options:
+	  -h, --help         Displays options
+	  -v, --version      Shows file2redis' version.
+	  -k, --key          The key to set. (Defaults: generated key)
+	  -e, --encoding     The encoding to use. (Defaults: utf8)
+	  -d, --deleteFile   Indicator to delete the file after the op. (Defaults: false)
+    
+    examples
+    $  file2redis -e base64 /some/path/to/a/file
+    >> OK  key -> redisfs:F246C436-B004-4218-B8AA-7766C6E0C604
+
+    $  file2redis -k my:key -d /some/path/to/a/file  
+    >> OK  key -> my:key
+
+### redis2file
+	Usage:
+	  redis2file [OPTIONS] key
+
+	Available options:
+	  -h, --help         Displays options
+	  -v, --version      Shows file2redis' version.
+	  -f, --file         The path of the file to write to. (Defaults: generated temp file)
+	  -e, --encoding     The encoding to use. (Defaults: utf8)
+	  -d, --delete       Indicator to delete the key after the op. (Defaults: true)
+
+## Using redisfs programmatically.
 ### Configuration & Construction
 RedisFs supports the follow configuration options that can be passed into either
 the RedisFs constructor or the redisfs factory method.
