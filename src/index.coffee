@@ -12,16 +12,12 @@ exports.version = '0.1.0'
 #   namespace  - String namespace prefix for generated Redis keys.
 #                (Default: redisfs).
 #   database   - Optional Integer of the Redis database to select.
-#   *dir       - Optional path to write files out to for generated files.
-#                (Default: your systems temporary directory)
 #   prefix     - Optional prefix to use for generated files.  (Default: 'redisfs')
 #   suffix     - Optional suffix to use for generated files. 
 #   deleteKey  - Optional boolean to indicate if the key should be
 #                deleted on a redis2file operation.  (Default: true)
 #   deleteFile - Optional boolean to indicate if the file should be
 #                deleted on a file2redis operation.  (Default: true)
-#
-# Note: all params marked as * represent future implementations
 #
 exports.redisfs = (options) ->
   new exports.RedisFs options
@@ -83,8 +79,6 @@ class RedisFs
   #                 will be generated.
   #     encoding  - Optional file encoding, defaults to utf8
   #                 This overrides the instance level options if specified.
-  #     *dir      - Optional path to write files out to for generated files.
-  #                 This overrides the instance level options if specified.
   #     prefix    - Optional prefix to use for generated files.
   #                 This overrides the instance level options if specified.
   #     suffix    - Optional suffix to use for generated files. 
@@ -95,8 +89,6 @@ class RedisFs
   #   callback    - Receives the and error as the first param
   #                 or a success hash that contains the path
   #                 and a fd to the file.
-  #
-  # Note: all params marked as * represent future implementations
   #
   redis2file: (key, options..., callback) ->
     options = @applyConfig options
