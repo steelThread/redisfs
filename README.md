@@ -46,7 +46,7 @@ in your node scripts.
 	  -s, --suffix       The filename suffix to use.
 	  -d, --deleteKey    Indicator to delete the key after the op. (Defaults: false)
 
-    $  redis2file.coffee -e base64 -f test/test.pdf redisfs:A8D367BD-1CE7-4FB3-9F90-2E94AF25430C
+    $  redis2file -e base64 -f test/test.pdf redisfs:A8D367BD-1CE7-4FB3-9F90-2E94AF25430C
 	>> file -> test/test.pdf
 
 ## Using redisfs programmatically.

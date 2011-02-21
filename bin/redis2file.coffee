@@ -45,5 +45,5 @@ if args[0]
     deleteKey: options.deleteKey or off
 
   redisfs.redis2file args[0], (err, result) ->
-    if err? then log "error: #{err}" else log "file -> #{result}"
+    if err? then log "error: #{err}" else log "OK  file -> #{result}"
     redisfs.end false
