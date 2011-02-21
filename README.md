@@ -1,9 +1,8 @@
-	 ____          _ _     _____    
-	|  _ \ ___  __| (_)___|  ___|__ 
-	| |_) / _ \/ _` | / __| |_ / __|
-	|  _ <  __/ (_| | \__ \  _|\__ \
-	|_| \_\___|\__,_|_|___/_|  |___/
-	
+									              _ _      __     
+									 _ __ ___  __| (_)___ / _|___ 
+									| '__/ _ \/ _` | / __| |_/ __|
+									| | |  __/ (_| | \__ \  _\__ \
+									|_|  \___|\__,_|_|___/_| |___/
 
 
 # About
@@ -28,7 +27,6 @@ in your node scripts.
 	  -e, --encoding     The encoding to use. (Defaults: utf8)
 	  -d, --deleteFile   Indicator to delete the file after the op. (Defaults: false)
     
-    examples
     $  file2redis -e base64 /some/path/to/a/file
     >> OK  key -> redisfs:F246C436-B004-4218-B8AA-7766C6E0C604
 
