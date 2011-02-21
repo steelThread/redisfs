@@ -79,8 +79,7 @@ class RedisFs
   # Pumps a redis value to a file and deletes the redis key.
   #   key         - The redis key to fetch.
   #   options     - Optional options object.
-  #     filename  - Optional filename to write to. assumes the file is
-  #                 preexisting and writable.  If ommitted a temp file 
+  #     filename  - Optional filename to write to. If ommitted a temp file 
   #                 will be generated.
   #     encoding  - Optional file encoding, defaults to utf8
   #                 This overrides the instance level options if specified.

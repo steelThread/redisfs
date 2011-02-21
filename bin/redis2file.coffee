@@ -20,7 +20,9 @@ switches = [
   ['-v', '--version', "Shows file2redis' version."]
   ['-f', '--filename [STRING]', 'The path of the file to write to. (Defaults: generated temp file)']
   ['-e', '--encoding [STRING]', 'The encoding to use. (Defaults: utf8)']
-  ['-d', '--deleteKey', 'Indicator to delete the key after the op. (Defaults: true)']
+  ['-p', '--prefix [STRING]', 'The filename prefix to use. (Defaults: redisfs)']
+  ['-s', '--suffix [STRING]', 'The filename suffix to use.']
+  ['-d', '--deleteKey', 'Indicator to delete the key after the op. (Defaults: false)']
 ]
 
 argv = process.argv[2..]
@@ -38,9 +40,9 @@ log "v#{redisfs.version}" if options.version
 
 if args[0]
   redisfs = redisfs.redisfs
-    filename: options.key if options.key? 
+    filename: options.filename if options.filename? 
     encoding: options.encoding if options.encoding?
-    deleteKey: options.deleteKey or on
+    deleteKey: options.deleteKey or off
 
   redisfs.redis2file args[0], (err, result) ->
     if err? then log "error: #{err}" else log "file -> #{result}"

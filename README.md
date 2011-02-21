@@ -40,13 +40,18 @@ in your node scripts.
 	Available options:
 	  -h, --help         Displays options
 	  -v, --version      Shows file2redis' version.
-	  -f, --file         The path of the file to write to. (Defaults: generated temp file)
+	  -f, --filename     The path of the file to write to. (Defaults: generated temp file)
 	  -e, --encoding     The encoding to use. (Defaults: utf8)
-	  -d, --delete       Indicator to delete the key after the op. (Defaults: true)
+	  -p, --prefix       The filename prefix to use. (Defaults: redisfs)
+	  -s, --suffix       The filename suffix to use.
+	  -d, --deleteKey    Indicator to delete the key after the op. (Defaults: false)
+
+    $  redis2file.coffee -e base64 -f test/test.pdf redisfs:A8D367BD-1CE7-4FB3-9F90-2E94AF25430C
+	>> file -> test/test.pdf
 
 ## Using redisfs programmatically.
 ### Configuration & Construction
-RedisFs supports the follow configuration options that can be passed into either
+redisfs supports the follow configuration options that can be passed into either
 the RedisFs constructor or the redisfs factory method.
 	# options - Optional Hash of options.
 	#   redis      - Existing instance of node_client.
