@@ -67,8 +67,6 @@ the RedisFs constructor or the redisfs factory method.
 	#   deleteFile - Optional boolean to indicate if the file should be
 	#                deleted on a file2redis operation.  (Default: true)
 	#
-	# Note: all params marked as * represent future implementations
-	#
 	
 	examples
 	
