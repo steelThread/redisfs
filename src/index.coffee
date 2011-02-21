@@ -131,7 +131,7 @@ class RedisFs
 
   #
   # @private
-  # Fets the value of the key.  Callback will be passed the value.
+  # Gets the value of the key.  Callback will be passed the value.
   #
   get: (key, callback) ->
     @redis.get key, (err, value) =>
@@ -162,11 +162,9 @@ class RedisFs
   # receive the filename.
   #
   open: (key, options, callback) ->
-    temp.open {prefix: options.prefix, suffix: options.suffix}, (err, file) =>
-      if err? then callback err
-      else
-        @files.push options.filename = file.path
-        @redis2file key, options, callback
+    options.filename = temp.path {prefix: options.prefix, suffix: options.suffix}
+    @files.push options.filename
+    @redis2file key, options, callback
 
   #
   # @private

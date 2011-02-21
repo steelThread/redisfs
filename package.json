@@ -15,6 +15,10 @@
     "underscore":    ">= 1.1.4",
     "coffee-script": ">= 1.0.0"
   },
-  "directories": { "lib": "./lib" },
+  "directories": { "lib": "./lib", "bin": "./bin" },
+  "bin": { 
+    "redis2file": "./bin/redis2file.coffee", 
+    "file2redis": "./bin/file2redis.coffee" 
+  },
   "engines": { "node": ">= 0.4.0" }
 }
