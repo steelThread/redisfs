@@ -13,7 +13,7 @@ exports.version = '0.1.0'
 #                (Default: redisfs).
 #   database   - Optional Integer of the Redis database to select.
 #   prefix     - Optional prefix to use for generated files.  (Default: 'redisfs')
-#   suffix     - Optional suffix to use for generated files. 
+#   suffix     - Optional suffix to use for generated files.
 #   deleteKey  - Optional boolean to indicate if the key should be
 #                deleted on a redis2file operation.  (Default: true)
 #   deleteFile - Optional boolean to indicate if the file should be
@@ -35,12 +35,12 @@ log   = console.log
 #
 # Option defaults
 #
-DEFAULTS =
-  deleteKey:  true
-  deleteFile: true
-  encoding:   'utf8'
-  namespace:  'redisfs'
-  prefix:     'redisfs-'
+DEFAULTS = Object.seal
+  deleteKey  : true
+  deleteFile : true
+  encoding   : 'utf8'
+  namespace  : 'redisfs'
+  prefix     : 'redisfs-'
 
 #
 # Util to pump files in & out of redis.
