@@ -66,8 +66,8 @@ class RedisFs
   file2redis: (filename, options..., callback) ->
     options = @applyConfig options
     fs.readFile filename, options.encoding, (err, data) =>
-      if err? then callback err 
-      else 
+      if err? then callback err
+      else
         @set options.key or @key(), data, callback
         @deleteFiles [_.remove filename, @files] if options.deleteFile is on
 
