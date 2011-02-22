@@ -74,7 +74,7 @@ the RedisFs constructor or the redisfs factory method.
     var redisfs = require('redisfs').redisfs();	
 
     // full customization
-    var redis = require('redisfs').redisfs({
+    var redisfs = require('redisfs').redisfs({
 	  redis: clientInstance,
 	  namespace: 'my:namespace',
 	  prefix: 'my-prefix-',

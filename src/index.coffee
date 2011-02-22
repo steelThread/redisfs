@@ -5,7 +5,7 @@ exports.version = '0.1.0'
 # are tracked so that they can be requested to be deleted at a
 # later time via the cleanup of end methods.
 #
-# options - Optional Hash of options.
+# options      - Optional hash of options.
 #   redis      - Existing instance of node_client.
 #   host       - String Redis host.  (Default: Redis' default)
 #   port       - Integer Redis port.  (Default: Redis' default)
@@ -53,7 +53,7 @@ class RedisFs
   #
   # Pumps a file's contents into a redis key and deletes the file. 
   #   filename     - The full path to the file to consume
-  #   options      - Optional options object 
+  #   options      - Optional hash of options.
   #     key        - Optional redis key.  If omitted a key will be 
   #                  generated using the default namespace and a uuid.
   #     encoding   - Optional file encoding.
@@ -74,7 +74,7 @@ class RedisFs
   #
   # Pumps a redis value to a file and deletes the redis key.
   #   key         - The redis key to fetch.
-  #   options     - Optional options object.
+  #   options     - Optional has of options.
   #     filename  - Optional filename to write to. If ommitted a temp file 
   #                 will be generated.
   #     encoding  - Optional file encoding, defaults to utf8
