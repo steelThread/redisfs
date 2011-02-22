@@ -40,7 +40,7 @@ log "v#{redisfs.version}" if options.version
 
 if args[0]
   redisfs = redisfs.redisfs
-    filename: options.filename if options.filename? 
+    filename: options.filename if options.filename?
     encoding: options.encoding if options.encoding?
     deleteKey: options.deleteKey or off
 

@@ -39,7 +39,7 @@ vows.describe('file2redis').addBatch(
       'value should be test': (err, result) ->
         assert.equal 'test', result
     teardown: -> teardown()
-  
+
   ###################################################
   'file2redis with passed encoding':
     topic: -> setup (err, file) => redisfs.file2redis file, {encoding: 'base64'}, @callback
@@ -52,7 +52,7 @@ vows.describe('file2redis').addBatch(
       'sets key with base64 encoded file contents': (err, result) ->
         assert.equal result, new Buffer('test', "ascii").toString('base64')
     teardown: -> teardown()
-  
+
   ###################################################
   'file2redis with passed key and encoding':
     topic: -> setup (err, file) => redisfs.file2redis file, {key: 'testtoo', encoding: 'base64'}, @callback

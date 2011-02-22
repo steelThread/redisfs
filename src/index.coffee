@@ -35,7 +35,7 @@ log   = console.log
 #
 # Option defaults
 #
-DEFAULTS = 
+DEFAULTS =
   deleteKey:  true
   deleteFile: true
   encoding:   'utf8'
@@ -43,7 +43,7 @@ DEFAULTS =
   prefix:     'redisfs-'
 
 #
-# Util to pump files in & out of redis.  
+# Util to pump files in & out of redis.
 #
 class RedisFs
   constructor: (options = {}, @keys = [], @files = []) ->
@@ -51,10 +51,10 @@ class RedisFs
     @redis = options.redis or connectToRedis options
 
   #
-  # Pumps a file's contents into a redis key and deletes the file. 
+  # Pumps a file's contents into a redis key and deletes the file.
   #   filename     - The full path to the file to consume
   #   options      - Optional hash of options.
-  #     key        - Optional redis key.  If omitted a key will be 
+  #     key        - Optional redis key.  If omitted a key will be
   #                  generated using the default namespace and a uuid.
   #     encoding   - Optional file encoding.
   #     deleteFile - Optional boolean to indicate whether the file file
@@ -75,13 +75,13 @@ class RedisFs
   # Pumps a redis value to a file and deletes the redis key.
   #   key         - The redis key to fetch.
   #   options     - Optional has of options.
-  #     filename  - Optional filename to write to. If ommitted a temp file 
+  #     filename  - Optional filename to write to. If ommitted a temp file
   #                 will be generated.
   #     encoding  - Optional file encoding, defaults to utf8
   #                 This overrides the instance level options if specified.
   #     prefix    - Optional prefix to use for generated files.
   #                 This overrides the instance level options if specified.
-  #     suffix    - Optional suffix to use for generated files. 
+  #     suffix    - Optional suffix to use for generated files.
   #                 This overrides the instance level options if specified.
   #     deleteKey - Optional boolean to indicate if the key should be
   #                 removed after the get operation.  (Default: to value
@@ -94,7 +94,7 @@ class RedisFs
     options = @applyConfig options
     if options.filename?
       @get key, (err, value) =>
-        if err? then callback err 
+        if err? then callback err
         else
           @write options.filename, value, options.encoding, callback
           @deleteKeys _.remove key, @keys if options.deleteKey is on
@@ -103,12 +103,12 @@ class RedisFs
 
   #
   # Delete generated resources.
-  #   options - Optional object indicating which generated resources to 
+  #   options - Optional object indicating which generated resources to
   #             delete (keys and/or files). Omission of options will result
   #             in the deletion of both files and keys.
   #     keys  - Optional boolean indicating whether files should be
   #             deleted.
-  #     files - Optional boolean indicating whether generated files 
+  #     files - Optional boolean indicating whether generated files
   #             should be deleted.
   #
   cleanup: (options) ->
@@ -123,7 +123,7 @@ class RedisFs
   #
   # End the redis connection and deletes all the resources generated during
   # the session.  Accepts the same args as cleanup.  To disable the cleanup
-  # pass false. 
+  # pass false.
   #
   end: (options) ->
     @cleanup options unless options is off
@@ -144,7 +144,7 @@ class RedisFs
   #
   set: (key, value, callback) ->
     @redis.set key, value, (err, reply) =>
-      if err? then callback err 
+      if err? then callback err
       else 
         callback null, {key: key, reply: reply}
 
@@ -154,7 +154,7 @@ class RedisFs
   #
   key: ->
     @keys.push key = "#{@config.namespace}:#{uuid()}"
-    key       
+    key
 
   #
   # @private
@@ -168,14 +168,14 @@ class RedisFs
 
   #
   # @private
-  # Overlayed the options onto the @config to create the 
-  # superset of options with the appropriate defaults.  
+  # Overlayed the options onto the @config to create the
+  # superset of options with the appropriate defaults.
   #
   applyConfig: (options) ->
     _.extend _.clone(@config), options[0]
 
   #
-  # @private 
+  # @private
   # Write to a file
   #
   write: (filename, value, encoding, callback) ->
@@ -194,7 +194,7 @@ class RedisFs
       @keys = [] if @keys is keys
     else
       @redis.del keys
-    
+
   #
   # @private
   # Delete all the generated files.  Errors are ignored.

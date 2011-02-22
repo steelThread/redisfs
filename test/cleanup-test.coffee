@@ -13,8 +13,8 @@ vows.describe('cleanup').addBatch(
     topic: -> setup (err, file) => redisfs.file2redis file, @callback
     'create a key to test': (err, result) ->
       assert.ok result.key?
-    'on end': 
-      topic: (result) -> 
+    'on end':
+      topic: (result) ->
         redisfs.end()
         redis.exists result.key, @callback
       'key is deleted from redis': (err, result) ->

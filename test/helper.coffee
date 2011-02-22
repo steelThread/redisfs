@@ -8,7 +8,7 @@ exports.redis = redis
 # creates a file fixture
 exports.setup = (callback) ->
   temp.open {prefix: 'redisfs-test-', suffix: '.txt'}, (err, file) ->
-    if err? then callback err else write file.path, callback    
+    if err? then callback err else write file.path, callback
 
 # flush redis
 exports.teardown = -> redis.flushdb()

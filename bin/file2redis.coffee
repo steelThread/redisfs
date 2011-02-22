@@ -37,7 +37,7 @@ log parser.help() if options.help
 log "v#{redisfs.version}" if options.version
 if args[0]
   redisfs = redisfs.redisfs
-    key: options.key if options.key? 
+    key: options.key if options.key?
     encoding: options.encoding if options.encoding?
     deleteFile: options.deleteFile or off
 

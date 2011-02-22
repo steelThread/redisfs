@@ -6,7 +6,7 @@
 
 
 # About
-RedisFs is a dead simple utility for moving files in and out of Redis.  
+RedisFs is a dead simple utility for moving files in and out of Redis.
 
 # Installing
 	$ npm install redisfs
@@ -26,11 +26,11 @@ in your node scripts.
 	  -k, --key          The key to set. (Defaults: generated key)
 	  -e, --encoding     The encoding to use. (Defaults: utf8)
 	  -d, --deleteFile   Indicator to delete the file after the op. (Defaults: false)
-    
+
     $  file2redis -e base64 /some/path/to/a/file
     >> OK  key -> redisfs:F246C436-B004-4218-B8AA-7766C6E0C604
 
-    $  file2redis -k my:key -d /some/path/to/a/file  
+    $  file2redis -k my:key -d /some/path/to/a/file
     >> OK  key -> my:key
 
 ### redis2file
@@ -53,7 +53,7 @@ in your node scripts.
 ### Configuration & Construction
 redisfs supports the follow configuration options that can be passed into either
 the RedisFs constructor or the redisfs factory method.
-	# options - Optional Hash of options.
+	# options      - Optional hash of options.
 	#   redis      - Existing instance of node_client.
 	#   host       - String Redis host.  (Default: Redis' default)
 	#   port       - Integer Redis port.  (Default: Redis' default)
@@ -61,7 +61,7 @@ the RedisFs constructor or the redisfs factory method.
 	#                (Default: redisfs).
 	#   database   - Optional Integer of the Redis database to select.
 	#   prefix     - Optional prefix to use for generated files.  (Default: 'redisfs')
-	#   suffix     - Optional suffix to use for generated files. 
+	#   suffix     - Optional suffix to use for generated files.
 	#   deleteKey  - Optional boolean to indicate if the key should be
 	#                deleted on a redis2file operation.  (Default: true)
 	#   deleteFile - Optional boolean to indicate if the file should be
@@ -71,7 +71,7 @@ the RedisFs constructor or the redisfs factory method.
 	examples
 	
 	// defaults
-    var redisfs = require('redisfs').redisfs();	
+    var redisfs = require('redisfs').redisfs();
 
     // full customization
     var redisfs = require('redisfs').redisfs({
@@ -85,10 +85,10 @@ the RedisFs constructor or the redisfs factory method.
 
 ### file2redis 
 
-	# Pumps a file's contents into a redis key and deletes the file. 
+	# Pumps a file's contents into a redis key and deletes the file.
 	#   filename     - The full path to the file to consume
 	#   options      - Optional hash of options. 
-	#     key        - Optional redis key.  If omitted a key will be 
+	#     key        - Optional redis key.  If omitted a key will be
 	#                  generated using the default namespace and a uuid.
 	#     encoding   - Optional file encoding.
 	#     deleteFile - Optional boolean to indicate whether the file file
@@ -103,16 +103,16 @@ the RedisFs constructor or the redisfs factory method.
     // defaults
 	redisfs.file2redis('/path/to/file, function(err, result) {
 	  if (err) throw err;
-	  console.log("Generated redis key: " + result.key);	
-	  console.log("Redis output: " + result.reply);	
+	  console.log("Generated redis key: " + result.key);
+	  console.log("Redis output: " + result.reply);
 	});
 	
 	// specify a key and override the encoding and deletion defaults
 	var options = {key: 'my:key', encoding: 'base64', deleteFile: false};
 	redisfs.file2redis('/path/to/file', options, function(err, result) {
 	  if (err) throw err;
-	  console.log("my redis key: " + result.key);	
-	  console.log("Redis output: " + result.reply);	
+	  console.log("my redis key: " + result.key);
+	  console.log("Redis output: " + result.reply);
 	});
 	
 ### redis2file
@@ -121,19 +121,19 @@ the RedisFs constructor or the redisfs factory method.
 	#   key         - The redis key to fetch.
 	#   options     - Optional hash of options.
 	#     filename  - Optional filename to write to. assumes the file is
-	#                 preexisting and writable.  If ommitted a temp file 
+	#                 preexisting and writable.  If ommitted a temp file
 	#                 will be generated.
 	#     encoding  - Optional file encoding, defaults to utf8
 	#                 This overrides the instance level options if specified.
 	#     prefix    - Optional prefix to use for generated files.
 	#                 This overrides the instance level options if specified.
-	#     suffix    - Optional suffix to use for generated files. 
+	#     suffix    - Optional suffix to use for generated files.
 	#                 This overrides the instance level options if specified.
 	#     deleteKey - Optional boolean to indicate if the key should be
 	#                 removed after the get operation.  (Default: to value
 	#                 set on instance)
 	#   callback    - Receives the and error as the first param
-	#                 or a success hash that contains the filename. 
+	#                 or a success hash that contains the filename.
 	#                 *the path and a fd to the file.
 	#
 	redis2file: (key, options..., callback) ->
@@ -143,39 +143,39 @@ the RedisFs constructor or the redisfs factory method.
     // defaults
 	redisfs.redis2file('my:key', function(err, result) {
 	  if (err) throw err;
-	  console.log("output file: " + result);	
+	  console.log("output file: " + result);
 	});
 
     // customization
     var options = {
-	  filename: 'myfile', 
-	  encoding: 'base64', 
+	  filename: 'myfile',
+	  encoding: 'base64',
 	  deleteKey: false
 	};
 	redisfs.redis2file('my:key', options, function(err, result) {
 	  if (err) throw err;
-	  console.log("output file: " + result);	
+	  console.log("output file: " + result);
 	});
 
     // customization
     var options = {
-	  prefix: 'my-file-prefix-', 
+	  prefix: 'my-file-prefix-',
 	  suffix: '.txt'
 	};
 	redisfs.redis2file('my:key', options, function(err, result) {
 	  if (err) throw err;
-	  console.log("output file: " + result);	
+	  console.log("output file: " + result);
 	});
 
 ### cleanup
 	#
 	# Delete generated resources.
-	#   options - Optional object indicating which generated resources to 
+	#   options - Optional object indicating which generated resources to
 	#             delete (keys and/or files). Omission of options will result
 	#             in the deletion of both files and keys.
 	#     keys  - Optional boolean indicating whether files should be
 	#             deleted.
-	#     files - Optional boolean indicating whether generated files 
+	#     files - Optional boolean indicating whether generated files
 	#             should be deleted.
 	#
     cleanup: (options) ->
@@ -187,12 +187,12 @@ the RedisFs constructor or the redisfs factory method.
 
     // delete keys but not files
     redisfs.cleanup({files: false});
-    
+
 ### end
 	#
 	# End the redis connection and deletes all the resources generated during
 	# the session.  Accepts the same args as cleanup.  To disable the cleanup
-	# pass false. 
+	# pass false.
 	#
 	end: (options) ->
 	
@@ -202,7 +202,7 @@ the RedisFs constructor or the redisfs factory method.
 	redisfs.end(false);
 	redisfs.end({keys: true, files: false});
     
-## License 
+## License
 
 MIT License
 

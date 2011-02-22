@@ -3,7 +3,7 @@
   "description": "Utility for moving files in and out of Redis",
   "version": "0.1.0",
   "author": "Sean McDaniel <sean.mcdaniel@me.com>",
-  "contributors": [ 
+  "contributors": [
     {"name": "Sean McDaniel", "email": "sean.mcdaniel@me.com"}
   ],
   "dependencies": {
@@ -16,9 +16,9 @@
     "coffee-script": ">= 1.0.0"
   },
   "directories": { "lib": "./lib", "bin": "./bin" },
-  "bin": { 
-    "redis2file": "./bin/redis2file.coffee", 
-    "file2redis": "./bin/file2redis.coffee" 
+  "bin": {
+    "redis2file": "./bin/redis2file.coffee",
+    "file2redis": "./bin/file2redis.coffee"
   },
   "engines": { "node": ">= 0.4.0" }
 }

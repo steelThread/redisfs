@@ -23,7 +23,7 @@ vows.describe('construct').addBatch(
     'uses passed namespace': (topic) ->
       assert.equal topic.config.namespace, 'ns'
     'uses passed redis client': (topic) ->
-      assert.equal topic.redis, 'test' 
+      assert.equal topic.redis, 'test'
     'uses passed prefix': (topic) ->
       assert.equal topic.config.prefix, 'prefix'
     'uses passed suffix': (topic) ->
