@@ -66,10 +66,9 @@ class RedisFs
   file2redis: (filename, options..., callback) ->
     options = @applyConfig options
     fs.readFile filename, options.encoding, (err, data) =>
-      if err? then callback err
-      else
-        @set options.key or @key(), data, callback
-        @deleteFiles [_.remove filename, @files] if options.deleteFile is on
+      return callback err if err?
+      @set options.key or @key(), data, callback
+      @deleteFiles [_.remove filename, @files] if options.deleteFile is on
 
   #
   # Pumps a redis value to a file and deletes the redis key.
@@ -94,10 +93,9 @@ class RedisFs
     options = @applyConfig options
     if options.filename?
       @get key, (err, value) =>
-        if err? then callback err
-        else
-          @write options.filename, value, options.encoding, callback
-          @deleteKeys _.remove key, @keys if options.deleteKey is on
+        return callback err if err?
+        @write options.filename, value, options.encoding, callback
+        @deleteKeys _.remove key, @keys if options.deleteKey is on
     else
       @open key, options, callback
 
@@ -144,9 +142,8 @@ class RedisFs
   #
   set: (key, value, callback) ->
     @redis.set key, value, (err, reply) =>
-      if err? then callback err
-      else 
-        callback null, {key: key, reply: reply}
+      return callback err if err?
+      callback null, {key: key, reply: reply}
 
   #
   # @private
