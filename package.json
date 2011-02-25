@@ -1,6 +1,6 @@
 {
   "name": "redisfs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Utility for moving files in and out of Redis",
   "keywords": ["redis", "files"],
   "homepage": "https://github.com/steelThread/redisfs",
