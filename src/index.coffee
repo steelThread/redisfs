@@ -48,11 +48,11 @@ DEFAULTS = Object.seal
 class RedisFs
   constructor: (options = {}, @keys = [], @files = []) ->
     @config = _.extend _.clone(DEFAULTS), options
-    @redis = options.redis or connectToRedis options
+    @redis  = options.redis or connectToRedis options
 
   #
   # Pumps a file's contents into a redis key and deletes the file.
-  #   filename     - The full path to the file to consume
+  #   file         - The full path to the file to consume
   #   options      - Optional hash of options.
   #     key        - Optional redis key.  If omitted a key will be
   #                  generated using the default namespace and a uuid.
@@ -63,18 +63,18 @@ class RedisFs
   #                  or success hash that contains the key and reply
   #                  as the second param.
   #
-  file2redis: (filename, options..., callback) ->
+  file2redis: (file, options..., callback) ->
     options = @applyConfig options
-    fs.readFile filename, options.encoding, (err, data) =>
+    fs.readFile file, options.encoding, (err, data) =>
       return callback err if err?
       @set options.key or @key(), data, callback
-      @deleteFiles [_.remove filename, @files] if options.deleteFile is on
+      @deleteFiles [_.remove file, @files] if options.deleteFile is on
 
   #
   # Pumps a redis value to a file and deletes the redis key.
   #   key         - The redis key to fetch.
   #   options     - Optional has of options.
-  #     filename  - Optional filename to write to. If ommitted a temp file
+  #     file      - Optional file to write to. If ommitted a temp file
   #                 will be generated.
   #     encoding  - Optional file encoding, defaults to utf8
   #                 This overrides the instance level options if specified.
@@ -91,10 +91,10 @@ class RedisFs
   #
   redis2file: (key, options..., callback) ->
     options = @applyConfig options
-    if options.filename?
+    if options.file?
       @get key, (err, value) =>
         return callback err if err?
-        @write options.filename, value, options.encoding, callback
+        @write options.file, value, options.encoding, callback
         @deleteKeys _.remove key, @keys if options.deleteKey is on
     else
       @open key, options, callback
@@ -156,11 +156,11 @@ class RedisFs
   #
   # @private
   # Pumps a redis value into a generated temp file. Callback will
-  # receive the filename.
+  # receive the file.
   #
   open: (key, options, callback) ->
-    options.filename = temp.path {prefix: options.prefix, suffix: options.suffix}
-    @files.push options.filename
+    options.file = temp.path {prefix: options.prefix, suffix: options.suffix}
+    @files.push options.file
     @redis2file key, options, callback
 
   #
@@ -175,9 +175,9 @@ class RedisFs
   # @private
   # Write to a file
   #
-  write: (filename, value, encoding, callback) ->
-    fs.writeFile filename, value, encoding, (err) =>
-      callback err, filename
+  write: (file, value, encoding, callback) ->
+    fs.writeFile file, value, encoding, (err) =>
+      callback err, file
 
   #
   # @private

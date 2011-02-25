@@ -40,7 +40,7 @@ in your node scripts.
 	Available options:
 	  -h, --help         Displays options
 	  -v, --version      Shows file2redis' version.
-	  -f, --filename     The path of the file to write to. (Defaults: generated temp file)
+	  -f, --file         The path of the file to write to. (Defaults: generated temp file)
 	  -e, --encoding     The encoding to use. (Defaults: utf8)
 	  -p, --prefix       The filename prefix to use. (Defaults: redisfs)
 	  -s, --suffix       The filename suffix to use.
@@ -86,7 +86,7 @@ the RedisFs constructor or the redisfs factory method.
 ### file2redis 
 
 	# Pumps a file's contents into a redis key and deletes the file.
-	#   filename     - The full path to the file to consume
+	#   file         - The full path to the file to consume
 	#   options      - Optional hash of options. 
 	#     key        - Optional redis key.  If omitted a key will be
 	#                  generated using the default namespace and a uuid.
@@ -96,7 +96,7 @@ the RedisFs constructor or the redisfs factory method.
 	#   callback     - Recieves either an error as the first param
 	#                  or success hash that contains the key and reply
 	#                  as the second param.
-	file2redis: (filename, options..., callback) ->
+	file2redis: (file, options..., callback) ->
 
     examples
 
@@ -120,7 +120,7 @@ the RedisFs constructor or the redisfs factory method.
 	# Pumps a redis value to a file and deletes the redis key.
 	#   key         - The redis key to fetch.
 	#   options     - Optional hash of options.
-	#     filename  - Optional filename to write to. assumes the file is
+	#     file      - Optional file to write to. assumes the file is
 	#                 preexisting and writable.  If ommitted a temp file
 	#                 will be generated.
 	#     encoding  - Optional file encoding, defaults to utf8
@@ -133,7 +133,7 @@ the RedisFs constructor or the redisfs factory method.
 	#                 removed after the get operation.  (Default: to value
 	#                 set on instance)
 	#   callback    - Receives the and error as the first param
-	#                 or a success hash that contains the filename.
+	#                 or a success hash that contains the file.
 	#                 *the path and a fd to the file.
 	#
 	redis2file: (key, options..., callback) ->
@@ -148,7 +148,7 @@ the RedisFs constructor or the redisfs factory method.
 
     // customization
     var options = {
-	  filename: 'myfile',
+	  file: 'myfile',
 	  encoding: 'base64',
 	  deleteKey: false
 	};
