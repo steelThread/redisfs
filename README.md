@@ -26,6 +26,7 @@ in your node scripts.
 	  -k, --key          The key to set. (Defaults: generated key)
 	  -e, --encoding     The encoding to use. (Defaults: utf8)
 	  -d, --deleteFile   Indicator to delete the file after the op. (Defaults: false)
+	  -x, --expire       Key expire in seconds.
 
     $  file2redis -e base64 /some/path/to/a/file
     >> OK  key -> redisfs:F246C436-B004-4218-B8AA-7766C6E0C604
@@ -66,7 +67,8 @@ the RedisFs constructor or the redisfs factory method.
 	#                deleted on a redis2file operation.  (Default: true)
 	#   deleteFile - Optional boolean to indicate if the file should be
 	#                deleted on a file2redis operation.  (Default: true)
-	#
+	#   encoding   - Optional file encoding. (Default: 'utf8')
+	#   expire     - Optional Integer representing expiration sections for a key.
 	
 	examples
 	
@@ -93,6 +95,8 @@ the RedisFs constructor or the redisfs factory method.
 	#     encoding   - Optional file encoding.
 	#     deleteFile - Optional boolean to indicate whether the file file
 	#                  should be deleted after it is pumped into redis.
+    #     expire     - Optional Integer representing expiration sections 
+    #                  for the key.
 	#   callback     - Recieves either an error as the first param
 	#                  or success hash that contains the key and reply
 	#                  as the second param.

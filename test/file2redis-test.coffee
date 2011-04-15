@@ -54,6 +54,19 @@ vows.describe('file2redis').addBatch(
     teardown: -> teardown()
 
   ###################################################
+  'file2redis with passed expiration':
+    topic: -> setup (err, file) => redisfs.file2redis file, {expire: 3}, @callback
+    'key set in redis': (err, result) ->
+      assert.equal 'OK', result.reply
+    'returns the generated key to the callback': (err, result) ->
+      assert.ok result.key?
+    'key has time to live':
+      topic: (result) -> redis.ttl result.key, @callback
+      'sets key with expire': (err, result) ->
+        assert.ok result isnt -1
+    teardown: -> teardown()
+
+  ###################################################
   'file2redis with passed key and encoding':
     topic: -> setup (err, file) => redisfs.file2redis file, {key: 'testtoo', encoding: 'base64'}, @callback
     'key set in redis': (err, result) ->

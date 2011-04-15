@@ -21,6 +21,7 @@ switches = [
   ['-k', '--key [STRING]', "The key to set. (Defaults: generated key)"]
   ['-e', '--encoding [STRING]', "The encoding to use. (Defaults: utf8)"]
   ['-d', '--deleteFile', "Indicator to delete the file after the op. (Defaults: false)"]
+  ['-x', '--expire [INTEGER]', "Key expire in seconds."]
 ]
 
 argv = process.argv[2..]
@@ -37,9 +38,10 @@ log parser.help() if options.help
 log "v#{redisfs.version}" if options.version
 if args[0]
   redisfs = redisfs.redisfs
-    key: options.key if options.key?
-    encoding: options.encoding if options.encoding?
-    deleteFile: options.deleteFile or off
+    key        : options.key if options.key?
+    encoding   : options.encoding if options.encoding?
+    expire     : options.expire if options.expire?
+    deleteFile : options.deleteFile or off
 
   redisfs.file2redis args[0], (err, result) ->
     if err? then log "error: #{err}" else log "#{result.reply}  key -> #{result.key}"

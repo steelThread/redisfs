@@ -1,4 +1,4 @@
-exports.version = '0.1.0'
+exports.version = '0.1.2'
 
 #
 # Sets up a new RedisFs instance.  Generated files and keys
@@ -18,6 +18,8 @@ exports.version = '0.1.0'
 #                deleted on a redis2file operation.  (Default: true)
 #   deleteFile - Optional boolean to indicate if the file should be
 #                deleted on a file2redis operation.  (Default: true)
+#   encoding   - Optional file encoding. (Default: 'utf8')
+#   expire     - Optional Integer representing expiration sections for a key.
 #
 exports.redisfs = (options) ->
   new exports.RedisFs options
@@ -59,6 +61,8 @@ class RedisFs
   #     encoding   - Optional file encoding.
   #     deleteFile - Optional boolean to indicate whether the file file
   #                  should be deleted after it is pumped into redis.
+  #     expire     - Optional Integer representing expiration sections 
+  #                  for the key.
   #   callback     - Recieves either an error as the first param
   #                  or success hash that contains the key and reply
   #                  as the second param.
@@ -67,7 +71,7 @@ class RedisFs
     options = @applyConfig options
     fs.readFile file, options.encoding, (err, data) =>
       return callback err if err?
-      @set options.key or @key(), data, callback
+      @set options.key or @key(), options.expire, data, callback
       @deleteFiles [_.remove file, @files] if options.deleteFile is on
 
   #
@@ -140,10 +144,13 @@ class RedisFs
   # Sets the value to a new redis key.  Callback will be passed
   # a result object containing the key and the redis reply.
   #
-  set: (key, value, callback) ->
-    @redis.set key, value, (err, reply) =>
+  set: (key, expire, value, callback) ->
+    cb = (err, reply) =>
       return callback err if err?
       callback null, {key: key, reply: reply}
+
+    if expire? then @redis.setex key, expire, value, cb
+    else @redis.set key, value, cb
 
   #
   # @private
