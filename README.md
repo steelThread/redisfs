@@ -72,7 +72,6 @@ the RedisFs constructor or the redisfs factory method.
 	
 	examples
 	
-``` JavaScript	
 	// defaults
     var redisfs = require('redisfs').redisfs();
 
@@ -85,7 +84,6 @@ the RedisFs constructor or the redisfs factory method.
 	  deleteKey: false,
 	  deleteFile: false
 	});
-```
 
 ### file2redis 
 
@@ -106,7 +104,6 @@ the RedisFs constructor or the redisfs factory method.
 
     examples
 
-``` JavaScript	
     // defaults
 	redisfs.file2redis('/path/to/file, function(err, result) {
 	  if (err) throw err;
@@ -121,7 +118,6 @@ the RedisFs constructor or the redisfs factory method.
 	  console.log("my redis key: " + result.key);
 	  console.log("Redis output: " + result.reply);
 	});
-```
 	
 ### redis2file
 	#
@@ -148,7 +144,6 @@ the RedisFs constructor or the redisfs factory method.
 
     examples
 
-``` JavaScript	
     // defaults
 	redisfs.redis2file('my:key', function(err, result) {
 	  if (err) throw err;
@@ -175,7 +170,6 @@ the RedisFs constructor or the redisfs factory method.
 	  if (err) throw err;
 	  console.log("output file: " + result);
 	});
-```
 
 ### cleanup
 	#
@@ -192,13 +186,11 @@ the RedisFs constructor or the redisfs factory method.
 
     examples
 
-``` JavaScript	
     // defaults
     redisfs.cleanup();
 
     // delete keys but not files
     redisfs.cleanup({files: false});
-```
 
 ### end
 	#
