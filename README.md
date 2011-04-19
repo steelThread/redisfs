@@ -54,8 +54,7 @@ in your node scripts.
 ### Configuration & Construction
 redisfs supports the follow configuration options that can be passed into either
 the RedisFs constructor or the redisfs factory method.
-``` javascript
-
+```javascript
 	# options      - Optional hash of options.
 	#   redis      - Existing instance of node_client.
 	#   host       - String Redis host.  (Default: Redis' default)
@@ -87,9 +86,7 @@ the RedisFs constructor or the redisfs factory method.
 	  deleteFile: false
 	});
 ```
-
 ### file2redis 
-``` javascript
 
 	# Pumps a file's contents into a redis key and deletes the file.
 	#   file         - The full path to the file to consume
@@ -123,10 +120,7 @@ the RedisFs constructor or the redisfs factory method.
 	  console.log("Redis output: " + result.reply);
 	});
 	
-```
-
 ### redis2file
-``` javascript
 	#
 	# Pumps a redis value to a file and deletes the redis key.
 	#   key         - The redis key to fetch.
@@ -177,10 +171,8 @@ the RedisFs constructor or the redisfs factory method.
 	  if (err) throw err;
 	  console.log("output file: " + result);
 	});
-```
 
 ### cleanup
-``` javascript
 	#
 	# Delete generated resources.
 	#   options - Optional object indicating which generated resources to
@@ -200,10 +192,8 @@ the RedisFs constructor or the redisfs factory method.
 
     // delete keys but not files
     redisfs.cleanup({files: false});
-``` 
 
 ### end
-``` javascript
 	#
 	# End the redis connection and deletes all the resources generated during
 	# the session.  Accepts the same args as cleanup.  To disable the cleanup
@@ -216,7 +206,6 @@ the RedisFs constructor or the redisfs factory method.
 	redisfs.end();
 	redisfs.end(false);
 	redisfs.end({keys: true, files: false});
-```
     
 ## License
 
