@@ -54,7 +54,6 @@ in your node scripts.
 ### Configuration & Construction
 redisfs supports the follow configuration options that can be passed into either
 the RedisFs constructor or the redisfs factory method.
-```javascript
 	# options      - Optional hash of options.
 	#   redis      - Existing instance of node_client.
 	#   host       - String Redis host.  (Default: Redis' default)
@@ -85,7 +84,7 @@ the RedisFs constructor or the redisfs factory method.
 	  deleteKey: false,
 	  deleteFile: false
 	});
-```
+
 ### file2redis 
 
 	# Pumps a file's contents into a redis key and deletes the file.
