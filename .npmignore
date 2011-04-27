@@ -1,0 +1,6 @@
+*.coffee
+.DS_Store
+.git*
+Makefile
+src/
+test/
