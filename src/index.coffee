@@ -1,4 +1,4 @@
-exports.version = '0.1.2'
+exports.version = '1.0.0'
 
 #
 # Sets up a new RedisFs instance.  Generated files and keys

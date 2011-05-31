@@ -1,8 +1,6 @@
-#!/usr/bin/env coffee
-
 coffee         = require 'coffee-script'
-redisfs        = require '../src/index'
-{OptionParser} = require 'coffee-script/optparse'
+redisfs        = require './index'
+{OptionParser} = require 'coffee-script/lib/optparse'
 
 log = console.log
 
@@ -26,24 +24,25 @@ switches = [
 ]
 
 argv = process.argv[2..]
-parser = new OptionParser switches, usage
-options = parser.parse argv
-args = options.arguments
-delete options.arguments
+@run = ->
+  parser = new OptionParser switches, usage
+  options = parser.parse argv
+  args = options.arguments
+  delete options.arguments
 
-if args.length is 0 and argv.length is 0
-  log parser.help()
-  log "v#{redisfs.version}"
+  if args.length is 0 and argv.length is 0
+    log parser.help()
+    log "v#{redisfs.version}"
 
-log parser.help() if options.help
-log "v#{redisfs.version}" if options.version
+  log parser.help() if options.help
+  log "v#{redisfs.version}" if options.version
 
-if args[0]
-  redisfs = redisfs.redisfs
-    file      : options.file if options.file?
-    encoding  : options.encoding if options.encoding?
-    deleteKey : options.deleteKey or off
+  if args[0]
+    redisfs = redisfs.redisfs
+      file      : options.file if options.file?
+      encoding  : options.encoding if options.encoding?
+      deleteKey : options.deleteKey or off
 
-  redisfs.redis2file args[0], (err, result) ->
-    if err? then log "error: #{err}" else log "OK  file -> #{result}"
-    redisfs.end false
+    redisfs.redis2file args[0], (err, result) ->
+      if err? then log "error: #{err}" else log "OK  file -> #{result}"
+      redisfs.end false

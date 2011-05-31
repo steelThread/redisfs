@@ -1,14 +1,14 @@
 {
   "name": "redisfs",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "description": "Utility for moving files in and out of Redis",
   "keywords": ["redis", "files"],
   "homepage": "https://github.com/steelThread/redisfs",
   "author": "Sean McDaniel <sean.mcdaniel@me.com>",
   "main": "./lib/index",
   "bin": {
-    "redis2file": "./bin/redis2file.coffee",
-    "file2redis": "./bin/file2redis.coffee"
+    "redis2file": "./bin/redis2file",
+    "file2redis": "./bin/file2redis"
   },
   "directories": { "lib": "./lib" },
   "respository": { 
@@ -17,11 +17,11 @@
   },
   "dependencies": {
     "vows":          ">= 0.5.6",
-    "hiredis":       ">= 0.1.7",
-    "redis":         ">= 0.5.2",
+    "hiredis":       ">= 0.1.10",
+    "redis":         ">= 0.5.11",
     "node-uuid":     ">= 1.1.0",
     "temp":          ">= 0.2.0",
-    "underscore":    ">= 1.1.4",
+    "underscore":    ">= 1.1.6",
     "coffee-script": ">= 1.0.0"
   },
   "engines": { "node": ">= 0.4.0" }
