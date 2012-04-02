@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <title>Redisfs by steelThread</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Redisfs</h1>
+        <h2>Utility for pumping files in and out of Redis in Node.js environments.</h2>
+
+        <section id="downloads">
+          <a href="https://github.com/steelThread/redisfs/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/steelThread/redisfs/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/steelThread/redisfs" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <h3>About</h3>
+
+<p>RedisFs is a dead simple utility for moving files in and out of Redis.</p>
+
+<h3>Installing</h3>
+
+<pre><code>$ npm install redisfs
+</code></pre>
+
+<h3>Usage</h3>
+
+<p>There are two ways to use redisfs via the command line interface or programmatically
+in your node scripts.</p>
+
+<h3>Using redisfs from the command line.</h3>
+
+<h3>file2redis</h3>
+
+<pre><code>Usage:
+  file2redis [OPTIONS] path
+
+Available options:
+  -h, --help         Displays options
+  -v, --version      Shows file2redis' version.
+  -k, --key          The key to set. (Defaults: generated key)
+  -e, --encoding     The encoding to use. (Defaults: utf8)
+  -d, --deleteFile   Indicator to delete the file after the op. (Defaults: false)
+  -x, --expire       Key expire in seconds.
+
+$  file2redis -e base64 /some/path/to/a/file
+&gt;&gt; OK  key -&gt; redisfs:F246C436-B004-4218-B8AA-7766C6E0C604
+
+$  file2redis -k my:key -d /some/path/to/a/file
+&gt;&gt; OK  key -&gt; my:key
+</code></pre>
+
+<h3>redis2file</h3>
+
+<pre><code>Usage:
+  redis2file [OPTIONS] key
+
+Available options:
+  -h, --help         Displays options
+  -v, --version      Shows file2redis' version.
+  -f, --file         The path of the file to write to. (Defaults: generated temp file)
+  -e, --encoding     The encoding to use. (Defaults: utf8)
+  -p, --prefix       The filename prefix to use. (Defaults: redisfs)
+  -s, --suffix       The filename suffix to use.
+  -d, --deleteKey    Indicator to delete the key after the op. (Defaults: false)
+
+$  redis2file -e base64 -f test/test.pdf redisfs:A8D367BD-1CE7-4FB3-9F90-2E94AF25430C
+&gt;&gt; OK  file -&gt; test/test.pdf
+</code></pre>
+
+<h3>Using redisfs programmatically.</h3>
+
+<h3>Configuration &amp; Construction</h3>
+
+<p>redisfs supports the follow configuration options that can be passed into either
+the RedisFs constructor or the redisfs factory method.</p>
+
+<pre><code># options      - Optional hash of options.
+#   redis      - Existing instance of node_client.
+#   host       - String Redis host.  (Default: Redis' default)
+#   port       - Integer Redis port.  (Default: Redis' default)
+#   namespace  - String namespace prefix for generated Redis keys.
+#                (Default: redisfs).
+#   database   - Optional Integer of the Redis database to select.
+#   prefix     - Optional prefix to use for generated files.  (Default: 'redisfs')
+#   suffix     - Optional suffix to use for generated files.
+#   deleteKey  - Optional boolean to indicate if the key should be
+#                deleted on a redis2file operation.  (Default: true)
+#   deleteFile - Optional boolean to indicate if the file should be
+#                deleted on a file2redis operation.  (Default: true)
+#   encoding   - Optional file encoding. (Default: 'utf8')
+#   expire     - Optional Integer representing expiration sections for a key.
+
+examples
+
+// defaults
+var redisfs = require('redisfs').redisfs();
+
+// full customization
+var redisfs = require('redisfs').redisfs({
+  redis: clientInstance,
+  namespace: 'my:namespace',
+  prefix: 'my-prefix-',
+  suffix: '.pdf',
+  deleteKey: false,
+  deleteFile: false
+});
+</code></pre>
+
+<h3>file2redis</h3>
+
+<pre><code># Pumps a file's contents into a redis key and deletes the file.
+#   file         - The full path to the file to consume
+#   options      - Optional hash of options. 
+#     key        - Optional redis key.  If omitted a key will be
+#                  generated using the default namespace and a uuid.
+#     encoding   - Optional file encoding.
+#     deleteFile - Optional boolean to indicate whether the file file
+#                  should be deleted after it is pumped into redis.
+#     expire     - Optional Integer representing expiration sections 
+#                  for the key.
+#   callback     - Recieves either an error as the first param
+#                  or success hash that contains the key and reply
+#                  as the second param.
+file2redis: (file, options..., callback) -&gt;
+
+examples
+
+// defaults
+redisfs.file2redis('/path/to/file, function(err, result) {
+  if (err) throw err;
+  console.log("Generated redis key: " + result.key);
+  console.log("Redis output: " + result.reply);
+});
+
+// specify a key and override the encoding and deletion defaults
+var options = {key: 'my:key', encoding: 'base64', deleteFile: false};
+redisfs.file2redis('/path/to/file', options, function(err, result) {
+  if (err) throw err;
+  console.log("my redis key: " + result.key);
+  console.log("Redis output: " + result.reply);
+});
+</code></pre>
+
+<h3>redis2file</h3>
+
+<pre><code>#
+# Pumps a redis value to a file and deletes the redis key.
+#   key         - The redis key to fetch.
+#   options     - Optional hash of options.
+#     file      - Optional file to write to. assumes the file is
+#                 preexisting and writable.  If ommitted a temp file
+#                 will be generated.
+#     encoding  - Optional file encoding, defaults to utf8
+#                 This overrides the instance level options if specified.
+#     prefix    - Optional prefix to use for generated files.
+#                 This overrides the instance level options if specified.
+#     suffix    - Optional suffix to use for generated files.
+#                 This overrides the instance level options if specified.
+#     deleteKey - Optional boolean to indicate if the key should be
+#                 removed after the get operation.  (Default: to value
+#                 set on instance)
+#   callback    - Receives the and error as the first param
+#                 or a success hash that contains the file.
+#                 *the path and a fd to the file.
+#
+redis2file: (key, options..., callback) -&gt;
+
+examples
+
+// defaults
+redisfs.redis2file('my:key', function(err, result) {
+  if (err) throw err;
+  console.log("output file: " + result);
+});
+
+// customization
+var options = {
+  file: 'myfile',
+  encoding: 'base64',
+  deleteKey: false
+};
+redisfs.redis2file('my:key', options, function(err, result) {
+  if (err) throw err;
+  console.log("output file: " + result);
+});
+
+// customization
+var options = {
+  prefix: 'my-file-prefix-',
+  suffix: '.txt'
+};
+redisfs.redis2file('my:key', options, function(err, result) {
+  if (err) throw err;
+  console.log("output file: " + result);
+});
+</code></pre>
+
+<h3>cleanup</h3>
+
+<pre><code>#
+# Delete generated resources.
+#   options - Optional object indicating which generated resources to
+#             delete (keys and/or files). Omission of options will result
+#             in the deletion of both files and keys.
+#     keys  - Optional boolean indicating whether files should be
+#             deleted.
+#     files - Optional boolean indicating whether generated files
+#             should be deleted.
+#
+cleanup: (options) -&gt;
+
+examples
+
+// defaults
+redisfs.cleanup();
+
+// delete keys but not files
+redisfs.cleanup({files: false});
+</code></pre>
+
+<h3>end</h3>
+
+<pre><code>#
+# End the redis connection and deletes all the resources generated during
+# the session.  Accepts the same args as cleanup.  To disable the cleanup
+# pass false.
+#
+end: (options) -&gt;
+
+examples
+
+redisfs.end();
+redisfs.end(false);
+redisfs.end({keys: true, files: false});
+</code></pre>
+
+<h3>License</h3>
+
+<p>MIT License</p>
+
+<p>Copyright (c) 2011 Sean McDaniel</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.</p>
+
+<h3>Author: <a href="http://www.mcdconsultingllc.com">Sean McDaniel</a>
+</h3>
+
+<h3>Contributors:</h3>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
